@@ -1,16 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using QuanLyDiem.Data;
-
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<QuanLyDiemDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-builder.Services.AddControllersWithViews();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
