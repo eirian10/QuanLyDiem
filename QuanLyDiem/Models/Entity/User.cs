@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace QuanLyDiem.Models
+namespace QuanLyDiem.Models.Entity
 {
     public class User
     {

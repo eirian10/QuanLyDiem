@@ -1,9 +1,8 @@
-﻿using QuanLyDiem.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace QuanLyDiem.Models
+namespace QuanLyDiem.Models.Entity
 {
     public class CourseClass
     {
