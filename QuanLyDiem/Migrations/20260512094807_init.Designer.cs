@@ -11,8 +11,8 @@ using QuanLyDiem.Data;
 namespace QuanLyDiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260511112312_InitSQLite")]
-    partial class InitSQLite
+    [Migration("20260512094807_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
