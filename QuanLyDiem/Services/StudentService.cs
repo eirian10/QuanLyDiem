@@ -14,12 +14,22 @@ namespace QuanLyDiem.Services
         }
 
         //Lay danh sach sinh vien, loc theo lop sinh hoat
-        public async Task<List<Student>> GetAllStudentsAsync(string homeroomClass)
+        public async Task<IEnumerable<Student>> GetAllStudentsAsync(string homeroomClass, string searchString)
         {
             var query = _context.Students.AsQueryable();
-            if (!string.IsNullOrEmpty(homeroomClass))
+
+            // Lọc theo lớp nếu có chọn
+            if (!string.IsNullOrWhiteSpace(homeroomClass))
             {
                 query = query.Where(s => s.HomeroomClass == homeroomClass);
+            }
+
+            // Lọc theo Tên hoặc Mã sinh viên nếu có nhập từ khóa
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                searchString = searchString.Trim().ToLower();
+                query = query.Where(s => s.FullName.ToLower().Contains(searchString)
+                                      || s.StudentCode.ToLower().Contains(searchString));
             }
 
             return await query.ToListAsync();
@@ -36,26 +46,19 @@ namespace QuanLyDiem.Services
         {
             return await _context.Students.FindAsync(id);
         }
-
-        bool IsStudentIdUnique(Student std)
-        {
-            bool check = true;
-            if (_context.Students.Any(s => s.StudentCode == std.StudentCode))
-            {
-                return false;
-            }
-            return check;
-        }
         public async Task<bool> AddStudentAsync(Student student)
         {
-            if (!IsStudentIdUnique(student))
+            var exists = await _context.Students
+                .AnyAsync(s => s.StudentCode == student.StudentCode);
+
+            if (exists)
             {
-                return false; // Mã sinh viên đã tồn tại
+                return false; 
             }
+
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
             return true;
-
         }
 
         public async Task<bool> UpdateStudentAsync(Student student)
