@@ -1,12 +1,14 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuanLyDiem.Data;
+using QuanLyDiem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+// Đăng ký StudentService theo phạm vi một yêu cầu (Scoped)
+builder.Services.AddScoped<StudentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
