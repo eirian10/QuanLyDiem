@@ -11,8 +11,8 @@ using QuanLyDiem.Data;
 namespace QuanLyDiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260515104218_UpdateStudentValidation")]
-    partial class UpdateStudentValidation
+    [Migration("20260516103428_InitialCreate_V3")]
+    partial class InitialCreate_V3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,17 +26,16 @@ namespace QuanLyDiem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ClassCode")
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("LecturerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Semester")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                    b.Property<int>("SemesterId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("INTEGER");
@@ -44,6 +43,8 @@ namespace QuanLyDiem.Migrations
                     b.HasKey("CourseClassId");
 
                     b.HasIndex("LecturerId");
+
+                    b.HasIndex("SemesterId");
 
                     b.HasIndex("SubjectId");
 
@@ -72,9 +73,77 @@ namespace QuanLyDiem.Migrations
 
                     b.HasIndex("CourseClassId");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("StudentId", "CourseClassId")
+                        .IsUnique();
 
                     b.ToTable("Enrollments");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.Faculty", b =>
+                {
+                    b.Property<int>("FacultyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FacultyCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FacultyName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("FacultyId");
+
+                    b.HasIndex("FacultyCode")
+                        .IsUnique();
+
+                    b.ToTable("Faculties");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.HomeroomClass", b =>
+                {
+                    b.Property<int>("HomeroomClassId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClassName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("HomeroomClassId");
+
+                    b.HasIndex("ClassName")
+                        .IsUnique();
+
+                    b.HasIndex("FacultyId");
+
+                    b.ToTable("HomeroomClasses");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.Semester", b =>
+                {
+                    b.Property<int>("SemesterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AcademicYear")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Term")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("SemesterId");
+
+                    b.HasIndex("Term", "AcademicYear")
+                        .IsUnique();
+
+                    b.ToTable("Semesters");
                 });
 
             modelBuilder.Entity("QuanLyDiem.Models.Student", b =>
@@ -90,14 +159,19 @@ namespace QuanLyDiem.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("FullName")
+                    b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("HomeroomClass")
+                    b.Property<string>("Gender")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("HomeroomClassId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StudentCode")
@@ -105,6 +179,8 @@ namespace QuanLyDiem.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("StudentId");
+
+                    b.HasIndex("HomeroomClassId");
 
                     b.HasIndex("StudentCode")
                         .IsUnique();
@@ -151,10 +227,12 @@ namespace QuanLyDiem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Department")
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -167,7 +245,6 @@ namespace QuanLyDiem.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Username")
@@ -176,6 +253,8 @@ namespace QuanLyDiem.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("FacultyId");
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -189,6 +268,12 @@ namespace QuanLyDiem.Migrations
                         .WithMany("CourseClasses")
                         .HasForeignKey("LecturerId");
 
+                    b.HasOne("QuanLyDiem.Models.Semester", "Semester")
+                        .WithMany("CourseClasses")
+                        .HasForeignKey("SemesterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("QuanLyDiem.Models.Subject", "Subject")
                         .WithMany("CourseClasses")
                         .HasForeignKey("SubjectId")
@@ -196,6 +281,8 @@ namespace QuanLyDiem.Migrations
                         .IsRequired();
 
                     b.Navigation("Lecturer");
+
+                    b.Navigation("Semester");
 
                     b.Navigation("Subject");
                 });
@@ -219,9 +306,59 @@ namespace QuanLyDiem.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("QuanLyDiem.Models.HomeroomClass", b =>
+                {
+                    b.HasOne("QuanLyDiem.Models.Faculty", "Faculty")
+                        .WithMany("HomeroomClasses")
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.Student", b =>
+                {
+                    b.HasOne("QuanLyDiem.Models.HomeroomClass", "HomeroomClass")
+                        .WithMany("Students")
+                        .HasForeignKey("HomeroomClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HomeroomClass");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.User", b =>
+                {
+                    b.HasOne("QuanLyDiem.Models.Faculty", "Faculty")
+                        .WithMany("Users")
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
+                });
+
             modelBuilder.Entity("QuanLyDiem.Models.CourseClass", b =>
                 {
                     b.Navigation("Enrollments");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.Faculty", b =>
+                {
+                    b.Navigation("HomeroomClasses");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.HomeroomClass", b =>
+                {
+                    b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("QuanLyDiem.Models.Semester", b =>
+                {
+                    b.Navigation("CourseClasses");
                 });
 
             modelBuilder.Entity("QuanLyDiem.Models.Student", b =>

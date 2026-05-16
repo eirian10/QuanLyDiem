@@ -9,19 +9,19 @@ namespace QuanLyDiem.Models
     {
         [Key]
         public int EnrollmentId { get; set; }
-
+        [Required]
         public int StudentId { get; set; }
         [ForeignKey("StudentId")]
-        public Student Student { get; set; }
-
+        public Student? Student { get; set; }
+        [Required]
         public int CourseClassId { get; set; }
         [ForeignKey("CourseClassId")]
-        public CourseClass CourseClass { get; set; }
+        public CourseClass? CourseClass { get; set; }
 
-        [Range(0, 10, ErrorMessage = "Điểm phải từ 0 đến 10")]
+        [Range(0.0, 10.0, ErrorMessage = "Điểm phải từ 0 đến 10")]
         public double? ProcessScore { get; set; } // Điểm quá trình
 
-        [Range(0, 10, ErrorMessage = "Điểm phải từ 0 đến 10")]
+        [Range(0.0, 10.0, ErrorMessage = "Điểm phải từ 0 đến 10")]
         public double? FinalScore { get; set; } // Điểm cuối kỳ
 
 

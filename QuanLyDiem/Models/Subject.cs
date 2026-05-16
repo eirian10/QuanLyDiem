@@ -10,21 +10,24 @@ namespace QuanLyDiem.Models
 
         [Required(ErrorMessage = "Mã môn học không được để trống")]
         [StringLength(20)]
-        public string SubjectCode { get; set; }
+        public string SubjectCode { get; set; } = null!;
 
         [Required(ErrorMessage = "Tên môn học không được để trống")]
         [MaxLength(100)]
-        public string SubjectName { get; set; }
+        public string SubjectName { get; set; } = null!;
 
-        [Range(1, 10, ErrorMessage = "Số tín chỉ phải từ 1 đến 10")]
+        [Required(ErrorMessage = "Số tín chỉ không được để trống.")]
+        [Range(1, 6, ErrorMessage = "Số tín chỉ phải từ 1 đến 6.")]
         public int Credits { get; set; }
 
-        [Required]
-        public double ProcessWeight { get; set; } // Trọng số quá trình (VD: 0.3)
+        [Required(ErrorMessage = "Trọng số điểm quá trình không được để trống.")]
+        [Range(0.0, 1.0, ErrorMessage = "Trọng số phải nằm trong khoảng từ 0.0 đến 1.0.")]
+        public double ProcessWeight { get; set; }
 
-        [Required]
-        public double FinalWeight { get; set; } // Trọng số thi (VD: 0.7)
+        [Required(ErrorMessage = "Trọng số điểm cuối kỳ không được để trống.")]
+        [Range(0.0, 1.0, ErrorMessage = "Trọng số phải nằm trong khoảng từ 0.0 đến 1.0.")]
+        public double FinalWeight { get; set; }
 
-        public ICollection<CourseClass> CourseClasses { get; set; }
+        public ICollection<CourseClass>? CourseClasses { get; set; }
     }
 }
