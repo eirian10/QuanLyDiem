@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuanLyDiem.Data;
 using QuanLyDiem.Models;
-using System.Diagnostics.Eventing.Reader;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace QuanLyDiem.Services
 {
     public class StudentService
@@ -13,39 +16,43 @@ namespace QuanLyDiem.Services
             _context = context;
         }
 
-        //Lay danh sach sinh vien, loc theo lop sinh hoat
-        public async Task<IEnumerable<Student>> GetAllStudentsAsync(string homeroomClass, string searchString)
+        // Lấy danh sách sinh viên: Lọc theo Id của lớp và từ khóa tìm kiếm
+        public async Task<IEnumerable<Student>> GetAllStudentsAsync(int? homeroomClassId, string searchString)
         {
-            var query = _context.Students.AsQueryable();
+            // Dùng .Include để nạp kèm thông tin lớp, giúp View hiển thị được ClassName
+            var query = _context.Students.Include(s => s.HomeroomClass).AsQueryable();
 
-            // Lọc theo lớp nếu có chọn
-            if (!string.IsNullOrWhiteSpace(homeroomClass))
+            // Lọc theo Id lớp sinh hoạt (int)
+            if (homeroomClassId.HasValue && homeroomClassId.Value > 0)
             {
-                query = query.Where(s => s.HomeroomClass == homeroomClass);
+                query = query.Where(s => s.HomeroomClassId == homeroomClassId.Value);
             }
 
-            // Lọc theo Tên hoặc Mã sinh viên nếu có nhập từ khóa
+            // Lọc theo Từ khóa (Tìm kiếm trên Mã SV, Họ lót, hoặc Tên)
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 searchString = searchString.Trim().ToLower();
-                query = query.Where(s => s.FullName.ToLower().Contains(searchString)
-                                      || s.StudentCode.ToLower().Contains(searchString));
+                query = query.Where(s => s.StudentCode.ToLower().Contains(searchString)
+                                      || s.LastName.ToLower().Contains(searchString)
+                                      || s.FirstName.ToLower().Contains(searchString));
             }
 
             return await query.ToListAsync();
         }
-        public async Task<List<string>> GetUniqueClassesAsync()
+
+        // Lấy danh sách tất cả các lớp sinh hoạt để nạp vào Dropdown tương tác trên View
+        public async Task<List<HomeroomClass>> GetUniqueClassesAsync()
         {
-              return await _context.Students
-                 .Select(s => s.HomeroomClass)
-                 .Where(c => !string.IsNullOrEmpty(c))
-                 .Distinct()
-                 .ToListAsync();
+            return await _context.HomeroomClasses.ToListAsync();
         }
-        public async Task<Student> GetStudentByIdAsync(int id)
+
+        public async Task<Student?> GetStudentByIdAsync(int id)
         {
-            return await _context.Students.FindAsync(id);
+            return await _context.Students
+                .Include(s => s.HomeroomClass)
+                .FirstOrDefaultAsync(s => s.StudentId == id);
         }
+
         public async Task<bool> AddStudentAsync(Student student)
         {
             var exists = await _context.Students
@@ -53,7 +60,7 @@ namespace QuanLyDiem.Services
 
             if (exists)
             {
-                return false; 
+                return false;
             }
 
             _context.Students.Add(student);
@@ -66,28 +73,40 @@ namespace QuanLyDiem.Services
             var existingStudent = await _context.Students.FindAsync(student.StudentId);
             if (existingStudent == null)
             {
-                return false; // Sinh viên không tồn tại
+                return false;
             }
-            // Cập nhật thông tin sinh viên
+
+            // Kiểm tra trùng mã sinh viên với người khác khi sửa
+            var codeExists = await _context.Students
+                .AnyAsync(s => s.StudentCode == student.StudentCode && s.StudentId != student.StudentId);
+            if (codeExists)
+            {
+                return false;
+            }
+
+            // Cập nhật chuẩn theo các thuộc tính mới của Model Student
             existingStudent.StudentCode = student.StudentCode;
-            existingStudent.FullName = student.FullName;
+            existingStudent.LastName = student.LastName;
+            existingStudent.FirstName = student.FirstName;
+            existingStudent.Gender = student.Gender;
             existingStudent.DateOfBirth = student.DateOfBirth;
-            existingStudent.HomeroomClass = student.HomeroomClass;
+            existingStudent.HomeroomClassId = student.HomeroomClassId;
             existingStudent.Email = student.Email;
+
             await _context.SaveChangesAsync();
             return true;
         }
+
         public async Task<bool> DeleteStudentAsync(int id)
         {
             var student = await _context.Students.FindAsync(id);
             if (student == null)
             {
-                return false; // Sinh viên không tồn tại
+                return false;
             }
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
             return true;
         }
-
     }
 }
