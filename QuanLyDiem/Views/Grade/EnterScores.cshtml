@@ -1,0 +1,71 @@
+﻿@using QuanLyDiem.ViewModels
+@model GradebookViewModel
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="text-primary">BẢNG NHẬP ĐIỂM CHI TIẾT</h4>
+            <p class="text-muted">Lớp: <strong>@Model.ClassCode</strong> | Môn học: <strong>@Model.SubjectName</strong></p>
+        </div>
+        <div>
+            <button type="submit" form="gradeForm" class="btn btn-success shadow-sm">
+                <i class="fas fa-save"></i> Lưu bảng điểm
+            </button>
+        </div>
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i> 
+            @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+    }
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <form id="gradeForm" asp-controller="Grade" asp-action="SaveScores" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="CourseClassId" />
+        <input type="hidden" asp-for="ClassCode" />
+        <input type="hidden" asp-for="SubjectName" />
+
+        <div class="table-responsive shadow-sm">
+            <table class="table table-bordered excel-table m-0">
+                <thead>
+                    <tr>
+                        <th width="50">STT</th>
+                        <th width="150">Mã Sinh Viên</th>
+                        <th>Họ và Tên</th>
+                        <th width="180">Điểm Quá Trình</th>
+                        <th width="180">Điểm Cuối Kỳ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Students.Count; i++)
+                    {
+                        <tr>
+                            <td class="text-center">@(i + 1)</td>
+                            <td class="text-center bg-light">
+                                <input type="hidden" asp-for="Students[i].EnrollmentId" />
+                                <input type="hidden" asp-for="Students[i].StudentCode" />
+                                <input type="hidden" asp-for="Students[i].FullName" />
+                                @Model.Students[i].StudentCode
+                            </td>
+                            <td class="ps-3 bg-light">@Model.Students[i].FullName</td>
+                            <td>
+                                <input asp-for="Students[i].ProcessScore"
+                                       type="number" step="0.1" min="0" max="10"
+                                       placeholder="-.-" />
+                            </td>
+                            <td>
+                                <input asp-for="Students[i].FinalScore"
+                                       type="number" step="0.1" min="0" max="10"
+                                       placeholder="-.-" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
