@@ -19,4 +19,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Admin\" />
+    <Folder Include="Areas\Teacher\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

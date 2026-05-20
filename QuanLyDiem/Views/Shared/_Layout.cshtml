@@ -1,49 +1,213 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - QuanLyDiem</title>
+    <title>@ViewData["Title"] - EduGrade</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/QuanLyDiem.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body { 
+            background-color: #f4f7f6; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding-top: 70px; 
+        }
+
+        .qnu-sidebar { 
+            background: linear-gradient(180deg, #162a52 0%, #0d1a33 100%); 
+            border-right: none; 
+        }
+
+        .sidebar-heading { 
+            color: #8fa6d3; 
+            font-size: 11px; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+        }
+
+        .list-group-item { 
+            background-color: transparent; 
+            color: #c0cde5; 
+            font-size: 14px; 
+            transition: all 0.2s ease; 
+            text-decoration: none; 
+        }
+
+        .menu-icon { font-size: 15px; opacity: 0.7; }
+
+        .custom-hover:hover { 
+            background-color: rgba(255, 255, 255, 0.08) !important; 
+            color: #ffffff !important; 
+            transform: translateX(4px); 
+        }
+
+        .custom-hover:hover .menu-icon { opacity: 1; }
+
+        .custom-active { 
+            background-color: rgba(255, 255, 255, 0.12) !important; 
+            color: #ffffff !important; 
+            border-left: 4px solid #ff9800 !important; 
+        }
+
+        .custom-active .menu-icon { color: #ff9800; opacity: 1; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b4d75; border-radius: 10px; }
+
+        .custom-logout:hover { background-color: rgba(220, 53, 69, 0.15) !important; color: #ff6b6b !important; }
+
+        .hover-scale { transition: transform 0.3s ease; }
+        .hover-scale:hover { transform: scale(1.1); }
+
+        .profile-badge { transition: all 0.3s ease; cursor: pointer; }
+        .profile-badge:hover { 
+            background: rgba(255, 255, 255, 0.2) !important; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+        }
+
+        .main-wrapper { 
+            margin-left: 250px; 
+            min-height: calc(100vh - 70px); 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer {
+            background-color: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QuanLyDiem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #162a52; height: 70px; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center text-white m-0" href="/">
+                <div class="bg-white rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 42px; height: 42px;">
+                    <i class="fas fa-university fs-5" style="color: #162a52;"></i>
                 </div>
+                <div class="d-flex flex-column">
+                    <span class="fw-bold text-uppercase" style="font-size: 15px; letter-spacing: 0.8px;">EduGrade</span>
+                    <span class="fw-medium" style="color: #ff9800; font-size: 11px; letter-spacing: 0.5px;">Quy Nhon University</span>
+                </div>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-4">
+                @if (User.Identity.IsAuthenticated)
+                {
+                        <div class="position-relative hover-scale" style="cursor: pointer;">
+                            <i class="fas fa-bell text-white fs-5 opacity-75"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                        </div>
+                        <div class="d-flex align-items-center px-3 py-1 rounded-pill profile-badge" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);">
+                            <img src="https://ui-avatars.com/api/?name=@User.Identity.Name&background=random" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;" />
+                            <div class="d-flex flex-column text-start">
+                                <span class="text-white fw-medium lh-1 mb-1" style="font-size: 13px;">@User.Identity.Name</span>
+                            @if (User.HasClaim(c => c.Type == System.Security.Claims.ClaimTypes.Role))
+                            {
+                                        <span class="text-white-50 lh-1" style="font-size: 10px;">@User.FindFirst(System.Security.Claims.ClaimTypes.Role).Value</span>
+                            }
+                            </div>
+                        </div>
+                }
+                else
+                {
+                        <a href="/Auth/Login" class="btn btn-sm text-white px-3 py-2 hover-scale" style="background-color: #ff9800; font-weight: 600; border-radius: 8px;">Đăng nhập</a>
+                }
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        </div>
+    </nav>
+
+    <div class="d-flex flex-column qnu-sidebar" style="width: 250px; height: calc(100vh - 70px); position: fixed; top: 70px; left: 0; z-index: 99;">
+        <div class="flex-grow-1 overflow-auto pt-3 px-3 custom-scrollbar">
+            <div class="sidebar-heading mt-2 mb-2 px-3">HỆ THỐNG</div>
+            <div class="list-group list-group-flush mb-3">
+                <a href="/" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-active d-flex align-items-center">
+                    <i class="fas fa-home menu-icon me-3"></i>
+                    <span class="fw-semibold">Trang chủ</span>
+                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-chalkboard-teacher menu-icon me-3"></i>
+                            <span class="fw-medium">Quản lý Giảng viên</span>
+                        </a>
+                }
+            </div>
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Lecturer"))
+            {
+                    <div class="sidebar-heading mt-3 mb-2 px-3">QUẢN LÝ ĐÀO TẠO</div>
+                    <div class="list-group list-group-flush mb-3">
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-book menu-icon me-3"></i>
+                            <span class="fw-medium">Quản lý Môn học</span>
+                        </a>
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-layer-group menu-icon me-3"></i>
+                            <span class="fw-medium">Lớp học phần</span>
+                        </a>
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-user-graduate menu-icon me-3"></i>
+                            <span class="fw-medium">Danh sách Sinh viên</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-heading mt-3 mb-2 px-3">NGHIỆP VỤ ĐIỂM</div>
+                    <div class="list-group list-group-flush mb-3">
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-pen-to-square menu-icon me-3"></i>
+                            <span class="fw-medium">Nhập điểm</span>
+                        </a>
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-file-invoice menu-icon me-3"></i>
+                            <span class="fw-medium">In bảng điểm</span>
+                        </a>
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-rotate-left menu-icon me-3"></i>
+                            <span class="fw-medium">In DS học lại</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-heading mt-3 mb-2 px-3">BÁO CÁO THỐNG KÊ</div>
+                    <div class="list-group list-group-flush mb-4">
+                        <a href="#" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-hover d-flex align-items-center">
+                            <i class="fas fa-chart-line menu-icon me-3"></i>
+                            <span class="fw-medium">Thống kê dữ liệu</span>
+                        </a>
+                    </div>
+            }
+
+            <div class="sidebar-heading mt-2 mb-2 px-3">TÀI KHOẢN</div>
+            <div class="list-group list-group-flush">
+                @if (User.Identity.IsAuthenticated)
+                {
+                        <a href="/Auth/Logout" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-logout d-flex align-items-center">
+                            <i class="fas fa-sign-out-alt menu-icon me-3 text-danger"></i>
+                            <span class="fw-medium text-danger">Đăng xuất</span>
+                        </a>
+                }
+            </div>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - QuanLyDiem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="main-wrapper">
+        <div class="flex-grow-1 p-4">
+            @RenderBody()
         </div>
-    </footer>
+
+        <div class="footer d-flex justify-content-between align-items-center px-4 py-3">
+            <div>© 2026 <strong style="color: #1c2536;">EduGrade - QNU</strong>. Công nghệ .Net.</div>
+            <div class="d-flex gap-4">
+                <span class="text-success fw-medium"><i class="fa-solid fa-shadow-halved"></i> Bảo mật</span>
+                <span class="text-warning fw-medium"><i class="fa-solid fa-headset"></i> Hỗ trợ: dqn@moet.edu.vn</span>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
