@@ -33,8 +33,7 @@ namespace QuanLyDiem.Services
             {
                 searchString = searchString.Trim().ToLower();
                 query = query.Where(s => s.StudentCode.ToLower().Contains(searchString)
-                                      || s.LastName.ToLower().Contains(searchString)
-                                      || s.FirstName.ToLower().Contains(searchString));
+                                      || (s.LastName.Trim() +" "+s.FirstName.Trim()).ToLower().Contains(searchString));
             }
 
             return await query.ToListAsync();
