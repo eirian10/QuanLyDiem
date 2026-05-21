@@ -2,7 +2,22 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-4 font-weight-bold text-primary">Welcome</h1>
+    <p class="lead text-muted">Learn about <a href="https://learn.microsoft.com/aspnet/core" target="_blank">building Web apps with ASP.NET Core</a>.</p>
+
+    <hr class="my-4" style="max-width: 400px; margin: 0 auto;" />
+
+    <div class="mt-4">
+        <h5 class="text-secondary mb-3"><i class="fas fa-flask"></i> Khu vực thử nghiệm chức năng (Lớp HP ID: 1)</h5>
+        <div class="d-flex justify-content-center gap-3">
+            <a asp-controller="Grade" asp-action="EnterScores" asp-route-id="1" class="btn btn-success btn-lg shadow-sm mx-2">
+                <i class="fas fa-edit mr-1"></i> 1. Nhập Điểm Lớp HP 1
+            </a>
+
+            <a asp-controller="Grade" asp-action="ViewGpaReport" asp-route-id="1" class="btn btn-primary btn-lg shadow-sm mx-2">
+                <i class="fas fa-chart-pie mr-1"></i> 2. Xem Báo Cáo GPA Lớp HP 1
+            </a>
+        </div>
+    </div>
 </div>

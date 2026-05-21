@@ -8,6 +8,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IGradeService, GradeService>();
+OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("QuanLyDiem");
 
 var app = builder.Build();
 
