@@ -5,6 +5,10 @@
         <div class="card-body bg-light">
             <div class="row align-items-center">
                 <div class="mb-3">
+                    @* Sử dụng biến ViewBag.IsFailedOnly kiểm tra trạng thái bộ lọc:
+                        - Nếu đang xem danh sách HỌC LẠI: Hiển thị nút quay về và nút in danh sách trượt.
+                        - Nếu đang xem danh sách TOÀN BỘ: Hiển thị nút lọc danh sách trượt và nút xuất báo cáo tổng.
+                    *@
                     @if (ViewBag.IsFailedOnly == true)
                     {
                         <a href="@Url.Action("ViewGpaReport", "Grade", new { id = ViewBag.CourseClassId, isFailedOnly = false })" class="btn btn-secondary">
@@ -31,6 +35,7 @@
     </div>
 
     <div class="row">
+
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white font-weight-bold d-flex align-items-center justify-content-between">
@@ -39,6 +44,7 @@
                         @(ViewBag.IsFailedOnly == true ? "Danh Sách Sinh Viên Học Lại (Điểm F)" : "Danh Sách Điểm Tổng Kết Sinh Viên")
                     </div>
                 </div>
+
                 <div class="card-body p-0">
                     <table class="table table-bordered excel-table read-only mb-0">
                         <thead>
@@ -58,15 +64,29 @@
                                     <tr>
                                         <td class="text-secondary">@item.StudentCode</td>
                                         <td class="font-weight-500">@item.FullName</td>
+
                                         <td class="text-center font-weight-bold text-secondary">
                                             @(item.FinalScore10?.ToString("0.0") ?? "-")
                                         </td>
+
                                         <td class="text-center font-weight-bold text-primary">
                                             @(item.GpaSystem4?.ToString("0.0") ?? "-")
                                         </td>
+
                                         <td class="text-center">
-                                            <span class="badge p-2 px-3 text-white @(item.LetterGrade == "A" ? "bg-success" : item.LetterGrade == "F" ? "bg-danger" : "bg-primary")" style="font-size: 0.9rem; min-width: 45px; display: inline-block;">
-                                                @item.LetterGrade
+                                            @{
+                                                string letter = item.LetterGrade;
+                                                // Thuật toán gán màu nhanh dựa theo ký tự đầu của điểm chữ:
+                                                // - Bắt đầu bằng 'A' (A+, A) -> màu xanh lá (bg-success)
+                                                // - Các nhóm Khá/Trung bình khá (B+, B, C) -> màu xanh dương (bg-primary)
+                                                // - Điểm Trung bình (D) -> màu vàng, chữ đen (bg-warning text-dark)
+                                                // - Còn lại (Điểm F) -> màu đỏ (bg-danger)
+                                                string badgeClass = letter.StartsWith("A") ? "bg-success" :
+                                                (letter == "B+" || letter == "B" || letter == "C") ? "bg-primary" :
+                                                letter == "D" ? "bg-warning text-dark" : "bg-danger";
+                                            }
+                                            <span class="badge p-2 px-3 text-white @badgeClass" style="font-size: 0.9rem; min-width: 45px; display: inline-block;">
+                                                @letter
                                             </span>
                                         </td>
                                     </tr>
@@ -85,6 +105,7 @@
         </div>
 
         <div class="col-md-4">
+
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-dark text-white text-center font-weight-bold">
                     <i class="fas fa-chart-pie mr-1"></i> Tỷ Lệ Phần Trăm Điểm Hệ Chữ
@@ -105,6 +126,8 @@
                             @(ViewBag.FailedCount ?? 0)
                         </strong> sinh viên.
                     </p>
+
+                    @* Hiển thị lời nhắc hoặc lời khen động tùy theo số lượng sinh viên trượt môn *@
                     @if (ViewBag.FailedCount > 0)
                     {
                         <small class="text-muted d-block mt-3" style="line-height: 1.4;">
@@ -120,6 +143,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -129,13 +153,16 @@
     <script src="~/js/gpa-chart.js" asp-append-version="true"></script>
 
     <script>
-        // Lấy dữ liệu dạng mảng JSON thô từ Controller qua ViewBag
+        // Đồng bộ dữ liệu mảng từ C# sang mảng đối tượng JavaScript qua ViewBag
+        // labelsLetter sẽ chứa danh sách các khóa: ["A+", "A", "B+", "B", "C", "D", "F"]
+        // dataLetter sẽ chứa danh sách số lượng sinh viên tương ứng: [2, 5, 12, 8, 4, 1, 0]
         const labelsLetter = @Html.Raw(Json.Serialize(ViewBag.LetterLabels));
         const dataLetter = @Html.Raw(Json.Serialize(ViewBag.LetterData));
 
-        // Khởi động chạy hàm vẽ biểu đồ ngay khi cấu hình cây thư mục DOM sẵn sàng
+        // Chờ toàn bộ cấu trúc cây DOM HTML tải xong rồi mới khởi tạo vẽ biểu đồ
         document.addEventListener("DOMContentLoaded", function () {
             if (labelsLetter && dataLetter && dataLetter.length > 0) {
+                // Gọi hàm khởi tạo biểu đồ hình tròn được định nghĩa trong file gpa-chart.js
                 initGpaPieChart(labelsLetter, dataLetter);
             }
         });

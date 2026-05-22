@@ -11,15 +11,18 @@ function initGpaPieChart(labels, data) {
     new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: labels,
+            labels: labels, // Nhận mảng động ["A+", "A", "B+", "B", "C", "D", "F"] từ Service đổ ra
             datasets: [{
                 data: data,
+                // Cập nhật hệ thống 7 dải màu phân cấp chuyên nghiệp cho biểu đồ hình tròn
                 backgroundColor: [
-                    '#28a745', // A - Xanh lá
-                    '#007bff', // B - Xanh dương
-                    '#17a2b8', // C - Xanh ngọc
-                    '#ffc107', // D - Vàng
-                    '#dc3545'  // F - Đỏ
+                    '#218838', // A+ - Xanh lá đậm (Xuất sắc)
+                    '#28a745', // A  - Xanh lá chuẩn (Giỏi)
+                    '#0069d9', // B+ - Xanh dương đậm (Khá giỏi)
+                    '#007bff', // B  - Xanh dương chuẩn (Khá)
+                    '#17a2b8', // C  - Xanh ngọc (Trung bình khá)
+                    '#ffc107', // D  - Vàng (Trung bình)
+                    '#dc3545'  // F  - Đỏ (Học lại / Yếu)
                 ]
             }]
         },

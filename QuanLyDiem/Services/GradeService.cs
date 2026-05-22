@@ -121,7 +121,7 @@ namespace QuanLyDiem.Services
             // Khởi tạo sẵn giá trị bằng 0 cho tất cả các đầu điểm
             var letterCounts = new Dictionary<string, int>
             {
-                { "A", 0 }, { "B", 0 }, { "C", 0 }, { "D", 0 }, { "F", 0 }
+                { "A+", 0 }, { "A", 0 }, { "B+", 0 }, { "B", 0 }, { "C", 0 }, { "D", 0 }, { "F", 0 }
             };
 
             if (gpaList != null)
@@ -143,11 +143,15 @@ namespace QuanLyDiem.Services
         private string CalculateLetterGrade(double? final10)
         {
             if (!final10.HasValue) return "Chưa xét";
-            if (final10 >= 8.5) return "A";
-            if (final10 >= 7.0) return "B";
-            if (final10 >= 5.5) return "C";
-            if (final10 >= 4.0) return "D";
-            return "F";
+            
+            if (final10 >= 9.0) return "A+"; // Từ 9.0 đến 10.0
+            if (final10 >= 8.0) return "A";  // Từ 8.0 đến 8.9
+            if (final10 >= 7.0) return "B+"; // Từ 7.0 đến 7.9
+            if (final10 >= 6.0) return "B";  // Từ 6.0 đến 6.9
+            if (final10 >= 5.0) return "C";  // Từ 5.0 đến 5.9
+            if (final10 >= 4.0) return "D";  // Từ 4.0 đến 4.9
+
+            return "F"; // Từ 0 đến 3.9 (Học lại)
         }
     }
 }
