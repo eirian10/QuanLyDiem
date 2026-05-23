@@ -36,7 +36,8 @@ namespace QuanLyDiem.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.FullName),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim("UserId", user.UserId.ToString()) // Thêm claim UserId để lưu trữ ID người dùng
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
