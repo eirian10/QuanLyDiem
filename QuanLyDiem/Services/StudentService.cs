@@ -17,23 +17,26 @@ namespace QuanLyDiem.Services
         }
 
         // Lấy danh sách sinh viên: Lọc theo Id của lớp và từ khóa tìm kiếm
-        public async Task<IEnumerable<Student>> GetAllStudentsAsync(int? homeroomClassId, string searchString)
+        public async Task<IEnumerable<Student>> GetAllStudentsAsync(int? homeroomClassId, string? searchString)
         {
             // Dùng .Include để nạp kèm thông tin lớp, giúp View hiển thị được ClassName
             var query = _context.Students.Include(s => s.HomeroomClass).AsQueryable();
 
             // Lọc theo Id lớp sinh hoạt (int)
-            if (homeroomClassId.HasValue && homeroomClassId.Value > 0)
+            if (homeroomClassId > 0)
             {
-                query = query.Where(s => s.HomeroomClassId == homeroomClassId.Value);
+                query = query.Where(s => s.HomeroomClassId == homeroomClassId);
             }
 
             // Lọc theo Từ khóa (Tìm kiếm trên Mã SV, Họ lót, hoặc Tên)
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                searchString = searchString.Trim().ToLower();
-                query = query.Where(s => s.StudentCode.ToLower().Contains(searchString)
-                                      || (s.LastName.Trim() +" "+s.FirstName.Trim()).ToLower().Contains(searchString));
+                var keyword = searchString.Trim();
+
+                query = query.Where(s => s.StudentCode.Contains(keyword)
+                                      || s.FirstName.Contains(keyword)
+                                      || s.LastName.Contains(keyword)
+                                      || (s.LastName + " " + s.FirstName).Contains(keyword));
             }
 
             return await query.ToListAsync();
