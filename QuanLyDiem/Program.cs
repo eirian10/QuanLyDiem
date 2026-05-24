@@ -16,6 +16,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Auth/Login";
         options.LogoutPath = "/Auth/Logout";
     });
+builder.Services.AddScoped<IGradeService, GradeService>();
+OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("QuanLyDiem");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
