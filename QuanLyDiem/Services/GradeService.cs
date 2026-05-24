@@ -99,9 +99,7 @@ namespace QuanLyDiem.Services
                                          ((e.FinalScore ?? 0) * sub.FinalWeight), 1),
 
                                      // Tính trực tiếp hệ 4 từ hệ 10 và làm tròn đến 1 chữ số thập phân
-                                     GpaSystem4 = Math.Round(
-                                         ((((e.ProcessScore ?? 0) * sub.ProcessWeight) +
-                                           ((e.FinalScore ?? 0) * sub.FinalWeight)) * 4.0) / 10.0, 1),
+                                     GpaSystem4 = 0, // Để mặc định để xử lý ở bước sau
 
                                      LetterGrade = "-" // Để mặc định để xử lý ở bước sau
                                  }).ToListAsync();
@@ -109,6 +107,7 @@ namespace QuanLyDiem.Services
             // Bước 3.2: Duyệt nhanh trong bộ nhớ RAM để gán Điểm Chữ (Tránh tạo SQL cồng kềnh)
             foreach (var item in gpaList)
             {
+                item.GpaSystem4 = CalculateGpaSystem4(item.FinalScore10);
                 item.LetterGrade = CalculateLetterGrade(item.FinalScore10);
             }
 
@@ -152,6 +151,19 @@ namespace QuanLyDiem.Services
             if (final10 >= 4.0) return "D";  // Từ 4.0 đến 4.9
 
             return "F"; // Từ 0 đến 3.9 (Học lại)
+        }
+
+        // --- Hàm Helper gán điểm hệ 4 dựa trên mốc điểm hệ 10 ---
+        private double CalculateGpaSystem4(double? final10)
+        {
+            if (final10 >= 9.0) return 4; // Từ 9.0 đến 10.0
+            if (final10 >= 8.0) return 3.5;  // Từ 8.0 đến 8.9
+            if (final10 >= 7.0) return 3; // Từ 7.0 đến 7.9
+            if (final10 >= 6.0) return 2.5;  // Từ 6.0 đến 6.9
+            if (final10 >= 5.0) return 2;  // Từ 5.0 đến 5.9
+            if (final10 >= 4.0) return 1.5;  // Từ 4.0 đến 4.9
+
+            return 0; // Từ 0 đến 3.9 (Học lại)
         }
     }
 }
