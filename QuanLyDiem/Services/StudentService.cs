@@ -31,12 +31,12 @@ namespace QuanLyDiem.Services
             // Lọc theo Từ khóa (Tìm kiếm trên Mã SV, Họ lót, hoặc Tên)
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                var keyword = searchString.Trim();
+                var keyword = searchString.ToLower().Trim();
 
                 query = query.Where(s => s.StudentCode.Contains(keyword)
-                                      || s.FirstName.Contains(keyword)
-                                      || s.LastName.Contains(keyword)
-                                      || (s.LastName + " " + s.FirstName).Contains(keyword));
+                                      || s.FirstName.ToLower().Contains(keyword)
+                                      || s.LastName.ToLower().Contains(keyword)
+                                      || (s.LastName.ToLower() + " " + s.FirstName.ToLower()).Contains(keyword));
             }
 
             return await query.ToListAsync();
