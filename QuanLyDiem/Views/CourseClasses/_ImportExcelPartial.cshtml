@@ -1,0 +1,19 @@
+﻿@model int
+
+<div class="card h-100 shadow-sm border-top border-info border-3">
+    <div class="card-header bg-white font-weight-bold text-info">
+        <i class="bi bi-file-earmark-excel"></i> Import danh sách từ file Excel
+    </div>
+    <div class="card-body">
+        <form asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="row g-2 align-items-center">
+            <input type="hidden" name="courseClassId" value="@Model" />
+            <div class="col-8">
+                <input type="file" name="excelFile" class="form-control" accept=".xlsx, .xls" required />
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn btn-info w-100">Tải Lên</button>
+            </div>
+        </form>
+        <small class="text-muted d-block mt-2">* Định dạng: File gồm 1 cột (Mã sinh viên) tại Sheet 1, dữ liệu đọc từ dòng thứ 2.</small>
+    </div>
+</div>

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using QuanLyDiem.Services;
 using System.Threading.Tasks;
 using QuanLyDiem.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuanLyDiem.Controllers
 {
+    [Authorize(Roles = "Admin")] 
     public class StudentsController : Controller
     {
         private readonly StudentService _studentService;
@@ -16,7 +18,7 @@ namespace QuanLyDiem.Controllers
         }
 
         // Thay đổi tham số homeroomClass sang kiểu int? homeroomClassId để đồng bộ bộ lọc
-        public async Task<IActionResult> Index(int? homeroomClassId, string searchString)
+        public async Task<IActionResult> Index(int? homeroomClassId, string? searchString)
         {
             var classes = await _studentService.GetUniqueClassesAsync();
 
