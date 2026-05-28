@@ -1,0 +1,89 @@
+﻿@model IEnumerable<QuanLyDiem.Models.Student>
+@{
+    ViewData["Title"] = "Chi tiết lớp học phần";
+    int classId = ViewBag.CourseClassId;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh sách lớp</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.ClassName</li>
+        </ol>
+    </nav>
+
+    <div class="card p-3 mb-4 bg-light shadow-sm border-start border-primary border-4">
+        <h4>Lớp Học Phần: <span class="text-primary">@ViewBag.ClassName</span></h4>
+        <p class="mb-0 text-secondary">Môn học: <strong>@ViewBag.SubjectName</strong></p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            @await Html.PartialAsync("_AddStudentManualPartial", classId)
+        </div>
+        <div class="col-md-6">
+            @await Html.PartialAsync("_ImportExcelPartial", classId)
+        </div>
+    </div>
+
+    <h5 class="mb-3"><i class="bi bi-list-ol"></i> Danh sách thành viên lớp (@Model.Count() sinh viên)</h5>
+    <table class="table table-hover border align-middle shadow-sm">
+        <thead class="table-secondary">
+            <tr>
+                <th>STT</th>
+                <th>Mã Sinh Viên</th>
+                <th>Họ & Tên</th>
+                <th>Ngày Sinh</th>
+                <th>Lớp Sinh Hoạt</th>
+                <th class="text-center">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int index = 1;
+                foreach (var student in Model)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td><strong>@student.StudentCode</strong></td>
+                        <td>@(student.LastName + " " + student.FirstName)</td>
+                        <td>@student.DateOfBirth.ToString("dd/MM/yyyy")</td>
+                        <td>@student.HomeroomClass?.ClassName</td>
+                        <td class="text-center">
+                            <form asp-action="RemoveStudent" method="post" onsubmit="return confirm('Xóa sinh viên này khỏi lớp học phần?');" class="d-inline">
+                                <input type="hidden" name="courseClassId" value="@classId" />
+                                <input type="hidden" name="studentId" value="@student.StudentId" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-person-x"></i> Xóa khỏi lớp
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted p-4">Lớp hiện chưa có sinh viên. Vui lòng thêm thủ công hoặc import từ Excel!</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
