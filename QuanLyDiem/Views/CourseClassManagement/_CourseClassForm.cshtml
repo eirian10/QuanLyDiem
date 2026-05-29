@@ -1,0 +1,41 @@
+﻿@model QuanLyDiem.Models.CourseClass
+
+<form id="courseClassForm" asp-action="@(Model.CourseClassId == 0 ? "Create" : "Edit")" asp-route-id="@Model.CourseClassId" method="post">
+    @Html.AntiForgeryToken()                                                                                                <input type="hidden" asp-for="CourseClassId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="ClassCode" class="form-label">Mã lớp học phần</label>
+        <input asp-for="ClassCode" class="form-control" placeholder="VD: CSDL_N01" />
+        <span asp-validation-for="ClassCode" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SemesterId" class="form-label">Học kỳ</label>
+        <select asp-for="SemesterId" class="form-select" asp-items="ViewBag.SemesterId">
+            <option value="">-- Chọn học kỳ --</option>
+        </select>
+        <span asp-validation-for="SemesterId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SubjectId" class="form-label">Môn học</label>
+        <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
+            <option value="">-- Chọn môn học --</option>
+        </select>
+        <span asp-validation-for="SubjectId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LecturerId" class="form-label">Giảng viên phụ trách</label>
+        <select asp-for="LecturerId" class="form-select" asp-items="ViewBag.LecturerId">
+            <option value="">-- Chọn giảng viên --</option>
+        </select>
+        <span asp-validation-for="LecturerId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        @(Model.CourseClassId == 0 ? "Lưu" : "Cập nhật")
+    </button>
+</form>   

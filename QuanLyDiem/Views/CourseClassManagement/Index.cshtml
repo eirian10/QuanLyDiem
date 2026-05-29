@@ -1,0 +1,62 @@
+﻿@model IEnumerable<QuanLyDiem.Models.CourseClass>
+
+    @{
+ViewData["Title"] = "Quản lý lớp học phần";
+    }
+
+    <h2 class="mb-3">Quản lý lớp học phần</h2> <button type="button" class="btn btn-primary mb-3" id="btnCreateCourseClass"> Thêm lớp học phần </button> <table class="table table-bordered table-striped">
+        <thead> <tr> <th>Mã lớp học phần</th> <th>Môn học</th> <th>Học kỳ</th> <th>Giảng viên phụ trách</th> <th style="width: 180px;">Thao tác</th> </tr> </thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td>@item.ClassCode</td>
+                <td>@item.Subject?.SubjectName</td>
+                <td>@item.Semester?.Term - @item.Semester?.AcademicYear</td>
+                <td>@item.Lecturer?.FullName</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-warning btnEditCourseClass" data-id="@item.CourseClassId"> Sửa </button>
+                    <a asp-action="Delete"
+                       asp-route-id="@item.CourseClassId"
+                       class="btn btn-sm btn-danger">
+                        Xóa
+                    </a>
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table> <div class="modal fade" id="courseClassModal" tabindex="-1" aria-labelledby="courseClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"> <h5 id="courseClassModalLabel" class="modal-title">Thông tin lớp học phần</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button> </div>
+                <div class="modal-body" id="courseClassModalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        @{
+await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+
+        <script>$(document).ready(function () {
+        $("#btnCreateCourseClass").click(function () {
+            $.get("/CourseClassManagement/CreateModal", function (data) {
+                $("#courseClassModalLabel").text("Thêm lớp học phần");
+                $("#courseClassModalBody").html(data);
+                $("#courseClassModal").modal("show");
+            });
+        });
+
+        $(".btnEditCourseClass").click(function () {
+            var id = $(this).data("id");
+
+            $.get("/CourseClassManagement/EditModal/" + id, function (data) {
+                $("#courseClassModalLabel").text("Sửa lớp học phần");
+                $("#courseClassModalBody").html(data);
+                $("#courseClassModal").modal("show");
+            });
+        });
+    });</script>
+
+    }

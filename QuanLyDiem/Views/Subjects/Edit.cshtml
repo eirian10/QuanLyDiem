@@ -1,0 +1,52 @@
+﻿@model QuanLyDiem.Models.Subject
+
+@{
+    ViewData["Title"] = "Sửa môn học";
+}
+
+<h2 class="mb-3">Sửa môn học</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="SubjectId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="SubjectCode" class="form-label">Mã môn học</label>
+        <input asp-for="SubjectCode" class="form-control" />
+        <span asp-validation-for="SubjectCode" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SubjectName" class="form-label">Tên môn học</label>
+        <input asp-for="SubjectName" class="form-control" />
+        <span asp-validation-for="SubjectName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Credits" class="form-label">Số tín chỉ</label>
+        <input asp-for="Credits" class="form-control" type="number" min="1" max="6" />
+        <span asp-validation-for="Credits" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ProcessWeight" class="form-label">Trọng số điểm quá trình</label>
+        <input asp-for="ProcessWeight" class="form-control" type="number" step="0.1" min="0" max="1" />
+        <span asp-validation-for="ProcessWeight" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FinalWeight" class="form-label">Trọng số điểm cuối kỳ</label>
+        <input asp-for="FinalWeight" class="form-control" type="number" step="0.1" min="0" max="1" />
+        <span asp-validation-for="FinalWeight" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

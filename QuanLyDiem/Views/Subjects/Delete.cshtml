@@ -1,0 +1,33 @@
+﻿@model QuanLyDiem.Models.Subject
+
+@{
+    ViewData["Title"] = "Xóa môn học";
+}
+
+<h2 class="mb-3">Xóa môn học</h2>
+
+<div class="alert alert-warning">
+    Bạn có chắc chắn muốn xóa môn học này không?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Mã môn học</dt>
+    <dd class="col-sm-9">@Model.SubjectCode</dd>
+
+    <dt class="col-sm-3">Tên môn học</dt>
+    <dd class="col-sm-9">@Model.SubjectName</dd>
+
+    <dt class="col-sm-3">Số tín chỉ</dt>
+    <dd class="col-sm-9">@Model.Credits</dd>
+
+    <dt class="col-sm-3">Trọng số quá trình</dt>
+    <dd class="col-sm-9">@Model.ProcessWeight</dd>
+
+    <dt class="col-sm-3">Trọng số cuối kỳ</dt>
+    <dd class="col-sm-9">@Model.FinalWeight</dd>
+</dl>
+
+<form asp-action="DeleteConfirmed" asp-route-id="@Model.SubjectId" method="post">
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>

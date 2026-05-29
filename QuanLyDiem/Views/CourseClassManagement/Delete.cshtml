@@ -1,0 +1,30 @@
+﻿@model QuanLyDiem.Models.CourseClass
+
+@{
+    ViewData["Title"] = "Xóa lớp học phần";
+}
+
+<h2 class="mb-3">Xóa lớp học phần</h2>
+
+<div class="alert alert-warning">
+    Bạn có chắc chắn muốn xóa lớp học phần này không?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Mã lớp học phần</dt>
+    <dd class="col-sm-9">@Model.ClassCode</dd>
+
+    <dt class="col-sm-3">Môn học</dt>
+    <dd class="col-sm-9">@Model.Subject?.SubjectName</dd>
+
+    <dt class="col-sm-3">Học kỳ</dt>
+    <dd class="col-sm-9">@Model.Semester?.Term - @Model.Semester?.AcademicYear</dd>
+
+    <dt class="col-sm-3">Giảng viên phụ trách</dt>
+    <dd class="col-sm-9">@Model.Lecturer?.FullName</dd>
+</dl>
+
+<form asp-action="DeleteConfirmed" asp-route-id="@Model.CourseClassId" method="post">
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
