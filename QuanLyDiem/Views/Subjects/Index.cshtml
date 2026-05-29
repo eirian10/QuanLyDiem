@@ -1,0 +1,91 @@
+﻿@model IEnumerable<QuanLyDiem.Models.Subject>
+
+@{
+    ViewData["Title"] = "Quản lý môn học";
+}
+
+<h2 class="mb-3">Quản lý môn học</h2>
+
+<button type="button" class="btn btn-primary mb-3" id="btnCreateSubject">
+    Thêm môn học
+</button>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Mã môn học</th>
+            <th>Tên môn học</th>
+            <th>Số tín chỉ</th>
+            <th>Trọng số quá trình</th>
+            <th>Trọng số cuối kỳ</th>
+            <th style="width: 180px;">Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.SubjectCode</td>
+                <td>@item.SubjectName</td>
+                <td>@item.Credits</td>
+                <td>@item.ProcessWeight</td>
+                <td>@item.FinalWeight</td>
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-warning btnEditSubject"
+                            data-id="@item.SubjectId">
+                        Sửa
+                    </button>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@item.SubjectId"
+                       class="btn btn-sm btn-danger">
+                        Xóa
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="subjectModal" tabindex="-1" aria-labelledby="subjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="subjectModalLabel" class="modal-title">Thông tin môn học</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+
+            <div class="modal-body" id="subjectModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $("#btnCreateSubject").click(function () {
+                $.get("/Subjects/CreateModal", function (data) {
+                    $("#subjectModalLabel").text("Thêm môn học");
+                    $("#subjectModalBody").html(data);
+                    $("#subjectModal").modal("show");
+                });
+            });
+
+            $(".btnEditSubject").click(function () {
+                var id = $(this).data("id");
+
+                $.get("/Subjects/EditModal/" + id, function (data) {
+                    $("#subjectModalLabel").text("Sửa môn học");
+                    $("#subjectModalBody").html(data);
+                    $("#subjectModal").modal("show");
+                });
+            });
+        });
+    </script>
+}

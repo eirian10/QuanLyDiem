@@ -10,15 +10,15 @@ namespace QuanLyDiem.Data
         {
         }
 
-        public DbSet<Faculty> Faculties { get; set; } = null!; // Bảng mới
+        public DbSet<Faculty> Faculties { get; set; } = null!;
         public DbSet<Semester> Semesters { get; set; } = null!;
         public DbSet<HomeroomClass> HomeroomClasses { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
-        public DbSet<Subject> Subjects { get; set; } = null!;
         public DbSet<Student> Students { get; set; } = null!;
+
+        public DbSet<Subject> Subjects { get; set; } = null!;
         public DbSet<CourseClass> CourseClasses { get; set; } = null!;
         public DbSet<Enrollment> Enrollments { get; set; } = null!;
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
