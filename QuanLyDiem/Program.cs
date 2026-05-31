@@ -10,6 +10,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllersWithViews();
 // Đăng ký StudentService theo phạm vi một yêu cầu (Scoped)
 builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<EnrollmentService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
