@@ -1,0 +1,192 @@
+﻿@model IEnumerable<QuanLyDiem.Models.Student>
+@{
+    ViewData["Title"] = "Chi tiết lớp học phần";
+    int classId = ViewBag.CourseClassId;
+}
+
+<style>
+    /* Đường dẫn điều hướng Breadcrumb */
+    .custom-breadcrumb .breadcrumb-item a {
+        color: #162a52;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .custom-breadcrumb .breadcrumb-item.active {
+        color: #ff9800;
+        font-weight: 600;
+    }
+
+    /* Khung thông tin chung lớp học phần */
+    .info-card {
+        background-color: #ffffff !important;
+        border: none !important;
+        border-left: 5px solid #162a52 !important;
+        border-radius: 8px;
+    }
+
+        .info-card h4 {
+            color: #162a52;
+            font-weight: 700;
+            font-size: 1.35rem;
+        }
+
+            .info-card h4 span {
+                color: #ff9800 !important;
+            }
+
+    /* Tiêu đề danh sách thành viên */
+    .list-title {
+        color: #162a52;
+        font-weight: 600;
+        font-size: 1.15rem;
+    }
+
+    /* Bảng danh sách sinh viên custom */
+    .student-table {
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        border: none !important;
+    }
+
+        .student-table thead {
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .student-table th {
+            color: #475569;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 12px;
+            border: none !important;
+        }
+
+        .student-table td {
+            font-size: 14px;
+            padding: 12px;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0 !important;
+            border-top: none !important;
+        }
+
+        .student-table tbody tr:hover {
+            background-color: rgba(22, 42, 82, 0.02);
+        }
+
+    /* Định dạng nút xóa khỏi lớp */
+    .btn-remove-student {
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-remove-student:hover {
+            background-color: #dc3545;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+        }
+</style>
+
+<div class="container-fluid px-1">
+    <nav aria-label="breadcrumb" class="custom-breadcrumb mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Index"><i class="fas fa-arrow-left me-1"></i>Danh sách lớp</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.ClassName</li>
+        </ol>
+    </nav>
+
+    <div class="card info-card p-4 mb-4 shadow-sm">
+        <h4 class="mb-2">Lớp Học Phần: <span>@ViewBag.ClassName</span></h4>
+        <p class="mb-0 text-secondary">
+            <i class="fas fa-book me-1.5" style="color: #ff9800;"></i>Môn học: <strong style="color: #1c2536;">@ViewBag.SubjectName</strong>
+        </p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2 fs-5"></i>
+            <span>@Html.Raw(TempData["Success"])</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+            <span>@Html.Raw(TempData["Error"])</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            @await Html.PartialAsync("_AddStudentManualPartial", classId)
+        </div>
+        <div class="col-md-6">
+            @await Html.PartialAsync("_ImportExcelPartial", classId)
+        </div>
+    </div>
+
+    <h5 class="mb-3 list-title">
+        <i class="fas fa-list-ol me-2" style="color: #ff9800;"></i>Danh sách thành viên lớp
+        <span class="text-secondary font-monospace" style="font-size: 14px;">(@Model.Count() sinh viên)</span>
+    </h5>
+
+    <table class="table student-table align-middle shadow-sm">
+        <thead>
+            <tr>
+                <th style="width: 70px;">STT</th>
+                <th>Mã Sinh Viên</th>
+                <th>Họ & Tên</th>
+                <th>Ngày Sinh</th>
+                <th>Lớp Sinh Hoạt</th>
+                <th class="text-center" style="width: 160px;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int index = 1;
+                foreach (var student in Model)
+                {
+                    <tr>
+                        <td class="text-secondary font-monospace">@index</td>
+                        <td><strong style="color: #162a52;">@student.StudentCode</strong></td>
+                        <td class="fw-medium">@(student.LastName + " " + student.FirstName)</td>
+                        <td>@student.DateOfBirth.ToString("dd/MM/yyyy")</td>
+                        <td><span class="badge bg-light text-secondary border px-2 py-1">@student.HomeroomClass?.ClassName</span></td>
+                        <td class="text-center">
+                            <form asp-action="RemoveStudent" method="post" onsubmit="return confirm('Xóa sinh viên này khỏi lớp học phần?');" class="d-inline">
+                                <input type="hidden" name="courseClassId" value="@classId" />
+                                <input type="hidden" name="studentId" value="@student.StudentId" />
+                                <button type="submit" class="btn btn-remove-student">
+                                    <i class="fas fa-user-minus me-1"></i>Xóa khỏi lớp
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-5">
+                        <i class="fas fa-users-slash fs-2 d-block mb-2 opacity-40"></i>
+                        Lớp hiện chưa có sinh viên. Vui lòng thêm thủ công hoặc thực hiện import từ dữ liệu file Excel!
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,63 @@
+﻿@model int
+
+<style>
+    /* Định dạng tổng thể thẻ Card Thêm bằng tay */
+    .card-manual {
+        border: none !important;
+        border-top: 3px solid #162a52 !important;
+        background-color: #ffffff;
+        border-radius: 8px;
+    }
+
+        /* Tiêu đề card header */
+        .card-manual .card-header {
+            color: #162a52;
+            font-weight: 600;
+            font-size: 14.5px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Custom lại ô input nhập mã */
+        .card-manual .form-control:focus {
+            border-color: #ff9800;
+            box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
+        }
+
+    /* Thiết kế nút bấm Thêm màu xanh navy đồng bộ hệ thống */
+    .btn-manual-submit {
+        background-color: #162a52;
+        color: #ffffff;
+        font-weight: 500;
+        font-size: 14px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+        .btn-manual-submit:hover {
+            background-color: #0d1a33;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(13, 26, 51, 0.2);
+        }
+</style>
+
+<div class="card h-100 shadow-sm card-manual">
+    <div class="card-header bg-white py-3">
+        <i class="fas fa-user-plus me-1.5" style="color: #ff9800;"></i> Thêm sinh viên thủ công
+    </div>
+    <div class="card-body d-flex align-items-center">
+        <form asp-action="AddStudentManual" method="post" class="w-100 row g-2 align-items-center">
+            <input type="hidden" name="courseClassId" value="@Model" />
+
+            <div class="col-8">
+                <input type="text" name="studentCode" class="form-control" placeholder="Nhập mã sinh viên..." required autocomplete="off" />
+            </div>
+
+            <div class="col-4">
+                <button type="submit" class="btn btn-manual-submit w-100 py-2">
+                    <i class="fas fa-plus me-1"></i>Thêm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

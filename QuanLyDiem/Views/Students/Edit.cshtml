@@ -5,74 +5,89 @@
 }
 
 <style>
+    /* Hệ màu chủ đạo đồng bộ EduGrade - QNU */
     :root {
-        --primary-green: #10b981;
-        --dark-green: #065f46;
-        --light-green: #f0fdf4;
+        --qnu-navy: #162a52;
+        --qnu-orange: #ff9800;
+        --qnu-dark-blue: #0d1a33;
+        --qnu-light-bg: #f8fafc;
     }
 
     .edit-card {
         border: none;
-        border-radius: 15px;
+        border-radius: 12px;
         overflow: hidden;
     }
 
-    .card-header-green {
-        background-color: var(--dark-green);
+    /* Đổi sang Gradient Xanh Navy đồng bộ với trang Create */
+    .card-header-navy {
+        background: linear-gradient(135deg, var(--qnu-navy), var(--qnu-dark-blue));
         color: white;
-        padding: 20px;
+        padding: 24px;
     }
 
     .form-label {
         font-weight: 600;
-        color: var(--dark-green);
+        color: var(--qnu-navy);
+        font-size: 14px;
+        margin-bottom: 0.25rem;
     }
 
+    /* Đổi hiệu ứng Focus sang sắc Cam nhận diện */
     .form-control:focus, .form-select:focus {
-        border-color: var(--primary-green);
-        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+        border-color: var(--qnu-orange);
+        box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.2);
     }
 
     .input-group-text {
-        background-color: var(--light-green);
+        background-color: var(--qnu-light-bg);
         border-color: #dee2e6;
+        color: #64748b;
     }
 
+    /* Tinh chỉnh nút Cập nhật thành màu cam hành động */
     .btn-update {
-        background-color: var(--primary-green);
+        background-color: var(--qnu-orange);
         color: white;
         border: none;
         font-weight: 600;
-        padding: 10px 25px;
-        transition: 0.3s;
+        font-size: 14px;
+        padding: 10px 30px;
+        transition: all 0.2s ease;
     }
 
         .btn-update:hover {
-            background-color: var(--dark-green);
+            background-color: #e68900;
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.25);
         }
 
     .btn-back {
         color: #64748b;
         text-decoration: none;
-        transition: 0.3s;
+        font-weight: 500;
+        font-size: 14px;
+        transition: 0.2s;
     }
 
         .btn-back:hover {
-            color: var(--dark-green);
+            color: var(--qnu-navy);
+            text-decoration: underline;
         }
 </style>
 
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7">
-            <div class="card edit-card shadow-lg animate__animated animate__fadeIn">
-                <div class="card-header-green text-center border-0">
-                    <h4 class="mb-0 fw-bold"><i class="fas fa-user-edit me-2"></i>Cập nhật thông tin Sinh viên</h4>
-                    <small class="opacity-75">Chỉnh sửa hồ sơ cho sinh viên: @Model.LastName @Model.FirstName</small>
+            <div class="card edit-card shadow-lg">
+                <div class="card-header-navy text-center border-0">
+                    <h4 class="mb-1 fw-bold" style="letter-spacing: 0.5px;">
+                        <i class="fas fa-user-edit me-2" style="color: var(--qnu-orange);"></i>Cập nhật thông tin Sinh viên
+                    </h4>
+                    <small class="text-white-50">Chỉnh sửa hồ sơ cho sinh viên: <strong class="text-white">@Model.LastName @Model.FirstName</strong></small>
                 </div>
+
                 <div class="card-body p-4 p-md-5 bg-white">
                     <form asp-action="Edit" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
@@ -82,17 +97,19 @@
                         <div class="mb-3">
                             <label asp-for="StudentCode" class="form-label">Mã số sinh viên (MSSV)</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light text-muted"><i class="fas fa-id-badge"></i></span>
+                                <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                 <input asp-for="StudentCode" class="form-control bg-light" readonly />
                             </div>
-                            <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Mã định danh duy nhất không thể thay đổi</small>
+                            <small class="text-muted d-block mt-1" style="font-size: 12px;">
+                                <i class="fas fa-info-circle me-1 text-secondary"></i>Mã định danh duy nhất không thể thay đổi
+                            </small>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-8">
                                 <label asp-for="LastName" class="form-label">Họ và tên lót</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user text-success"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
                                     <input asp-for="LastName" class="form-control" placeholder="Nhập họ và tên lót đầy đủ" />
                                 </div>
                                 <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
@@ -100,7 +117,7 @@
                             <div class="col-md-4 mt-3 mt-md-0">
                                 <label asp-for="FirstName" class="form-label">Tên chính</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user-tag text-success"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                     <input asp-for="FirstName" class="form-control" placeholder="Nhập tên" />
                                 </div>
                                 <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
@@ -111,7 +128,7 @@
                             <div class="col-md-6">
                                 <label asp-for="Gender" class="form-label">Giới tính</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-venus-mars text-success"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
                                     <select asp-for="Gender" class="form-select">
                                         <option value="Nam">Nam</option>
                                         <option value="Nữ">Nữ</option>
@@ -123,7 +140,7 @@
                             <div class="col-md-6 mt-3 mt-md-0">
                                 <label asp-for="DateOfBirth" class="form-label">Ngày sinh</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-calendar-alt text-success"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                                     <input asp-for="DateOfBirth" type="date" class="form-control" asp-format="{0:yyyy-MM-dd}" />
                                 </div>
                                 <span asp-validation-for="DateOfBirth" class="text-danger small mt-1 d-block"></span>
@@ -133,7 +150,7 @@
                         <div class="mb-3">
                             <label asp-for="HomeroomClassId" class="form-label">Lớp sinh hoạt</label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-school text-success"></i></span>
+                                <span class="input-group-text"><i class="fas fa-school"></i></span>
                                 <select asp-for="HomeroomClassId" class="form-select" asp-items="ViewBag.HomeroomClassId">
                                     <option value="">-- Vui lòng chọn lớp --</option>
                                 </select>
@@ -144,20 +161,20 @@
                         <div class="mb-4">
                             <label asp-for="Email" class="form-label">Địa chỉ Email</label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope text-success"></i></span>
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
                             </div>
                             <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
                         </div>
 
-                        <hr class="my-4 text-muted" style="opacity: 0.15;">
+                        <hr class="my-4" style="border-top: 1px solid #e2e8f0; opacity: 1;">
 
                         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
                             <a asp-action="Index" class="btn-back order-2 order-sm-1">
-                                <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+                                <i class="fas fa-arrow-left me-1.5"></i>Quay lại danh sách
                             </a>
-                            <button type="submit" class="btn btn-update rounded-pill shadow-sm order-1 order-sm-2 w-100 w-sm-auto">
-                                <i class="fas fa-save me-1"></i> Lưu thay đổi
+                            <button type="submit" class="btn btn-update rounded-3 shadow-sm order-1 order-sm-2 w-100 w-sm-auto">
+                                <i class="fas fa-save me-1.5"></i>Lưu thay đổi
                             </button>
                         </div>
                     </form>

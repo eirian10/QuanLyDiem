@@ -1,0 +1,146 @@
+﻿@model IEnumerable<QuanLyDiem.Models.CourseClass>
+@{
+    ViewData["Title"] = "Lớp học phần của tôi";
+}
+
+<style>
+    /* Tổng thể khối tiêu đề */
+    .page-title {
+        color: #162a52;
+        font-weight: 700;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #ff9800;
+        padding-bottom: 8px;
+    }
+
+    /* Tinh chỉnh bảng dữ liệu theo tone màu EduGrade */
+    .custom-table {
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        border: none !important;
+    }
+
+        .custom-table thead {
+            background-color: #162a52;
+            color: #ffffff;
+        }
+
+        .custom-table th {
+            font-weight: 600;
+            font-size: 14px;
+            padding: 14px;
+            border: none !important;
+        }
+
+        .custom-table td {
+            font-size: 14px;
+            padding: 14px;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0 !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        /* Hiệu ứng mượt mà khi di chuột qua các dòng */
+        .custom-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: rgba(22, 42, 82, 0.03);
+            }
+
+    /* Thiết kế nút bấm custom */
+    .btn-custom-b {
+        background-color: #162a52;
+        color: #ffffff;
+        font-weight: 500;
+        font-size: 13px;
+        border-radius: 6px;
+        padding: 6px 14px;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+        .btn-custom-b:hover {
+            background-color: #0d1a33;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(13, 26, 51, 0.2);
+        }
+
+    .btn-custom-c {
+        background-color: #ff9800;
+        color: #ffffff;
+        font-weight: 500;
+        font-size: 13px;
+        border-radius: 6px;
+        padding: 6px 14px;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+        .btn-custom-c:hover {
+            background-color: #e68900;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(230, 137, 0, 0.2);
+        }
+
+    .action-gap {
+        gap: 8px;
+    }
+</style>
+
+<div class="container-fluid px-1">
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="page-title m-0">
+            <i class="fas fa-layer-group me-2" style="color: #ff9800;"></i> Danh Sách Lớp Học Phần Quản Lý
+        </h2>
+    </div>
+
+    <table class="table custom-table align-middle shadow-sm">
+        <thead>
+            <tr>
+                <th>Mã Lớp Học Phần</th>
+                <th>Tên Môn Học</th>
+                <th class="text-center">Số Tín Chỉ</th>
+                <th>Học Kỳ / Năm Học</th>
+                <th class="text-center" style="width: 280px;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong style="color: #162a52;">@item.ClassCode</strong></td>
+                        <td class="fw-medium">@item.Subject?.SubjectName</td>
+                        <td class="text-center"><span class="badge bg-light text-dark border px-2.5 py-1.5" style="font-size: 12px;">@item.Subject?.Credits TC</span></td>
+                        <td>Học kỳ @item.Semester?.Term — Năm học @item.Semester?.AcademicYear</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center action-gap">
+                                <a asp-controller="Enrollments" asp-action="Details" asp-route-id="@item.CourseClassId" class="btn btn-custom-b">
+                                    <i class="fas fa-users me-1.5"></i>Sinh viên
+                                </a>
+                                <a asp-controller="Grade" asp-action="EnterScores" asp-route-id="@item.CourseClassId" class="btn btn-custom-c">
+                                    <i class="fas fa-pen-to-square me-1.5"></i>Nhập điểm
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-5">
+                        <i class="fas fa-folder-open fs-2 d-block mb-2 opacity-50"></i>
+                        Không tìm thấy dữ liệu lớp học phần được phân công trong hệ thống.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
