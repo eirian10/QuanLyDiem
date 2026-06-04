@@ -4,59 +4,242 @@
 ViewData["Title"] = "Quản lý lớp học phần";
     }
 
-    <h2 class="mb-3">Quản lý lớp học phần</h2> <button type="button" class="btn btn-primary mb-3" id="btnCreateCourseClass"> Thêm lớp học phần </button> <table class="table table-bordered table-striped">
-        <thead> <tr> <th>Mã lớp học phần</th> <th>Môn học</th> <th>Học kỳ</th> <th>Giảng viên phụ trách</th> <th style="width: 180px;">Thao tác</th> </tr> </thead>
-        <tbody>
-            @foreach (var item in Model) {
-            <tr>
-                <td>@item.ClassCode</td>
-                <td>@item.Subject?.SubjectName</td>
-                <td>@item.Semester?.Term - @item.Semester?.AcademicYear</td>
-                <td>@item.Lecturer?.FullName</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-warning btnEditCourseClass" data-id="@item.CourseClassId"> Sửa </button>
-                    <a asp-action="Delete"
-                       asp-route-id="@item.CourseClassId"
-                       class="btn btn-sm btn-danger">
-                        Xóa
-                    </a>
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table> <div class="modal fade" id="courseClassModal" tabindex="-1" aria-labelledby="courseClassModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header"> <h5 id="courseClassModalLabel" class="modal-title">Thông tin lớp học phần</h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button> </div>
-                <div class="modal-body" id="courseClassModalBody">
-                </div>
+    <div class="courseclass-page-wrapper">
+        <div class="courseclass-card">
+            <div class="courseclass-card-header">
+                <h3>DANH SÁCH LỚP HỌC PHẦN</h3>
+
+                <a asp-action="Create" class="btn btn-light btn-add-courseclass">
+                    + Thêm lớp học phần
+                </a>
+            </div>
+
+            <div class="courseclass-search-box">
+                <input type="text"
+                       id="searchCourseClass"
+                       class="form-control"
+                       placeholder="Tìm theo mã lớp, môn học, giảng viên..." />
+            </div>
+
+            <div class="table-responsive">
+                <table class="table courseclass-table mb-0" id="courseClassTable">
+                    <thead>
+                        <tr>
+                            <th>Mã lớp</th>
+                            <th>Môn học</th>
+                            <th>Giảng viên</th>
+                            <th class="text-center">Học kỳ</th>
+                            <th class="text-center">Năm học</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr data-search="@($"{item.ClassCode} {item.Subject?.SubjectName} {item.Lecturer?.FullName} {item.Semester?.Term} {item.Semester?.AcademicYear}".ToLower())">
+                            <td class="fw-semibold courseclass-code">@item.ClassCode</td>
+                            <td>@item.Subject?.SubjectName</td>
+                            <td>@item.Lecturer?.FullName</td>
+                            <td class="text-center">@item.Semester?.Term</td>
+                            <td class="text-center">@item.Semester?.AcademicYear</td>
+                            <td class="text-center">
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.CourseClassId"
+                                   class="btn btn-sm btn-edit">
+                                    Sửa
+                                </a>
+
+                                <form asp-action="Delete"
+                                      asp-route-id="@item.CourseClassId"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Bạn có chắc muốn xóa lớp học phần này?');">
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit" class="btn btn-sm btn-delete">
+                                        Xóa
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Chưa có lớp học phần nào
+                            </td>
+                        </tr>
+                }
+                    </tbody>
+                </table>
             </div>
         </div>
+
     </div>
 
-    @section Scripts {
-        @{
-await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    <style>
+        .courseclass-page-wrapper {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            min-height: 640px;
         }
 
-        <script>$(document).ready(function () {
-        $("#btnCreateCourseClass").click(function () {
-            $.get("/CourseClassManagement/CreateModal", function (data) {
-                $("#courseClassModalLabel").text("Thêm lớp học phần");
-                $("#courseClassModalBody").html(data);
-                $("#courseClassModal").modal("show");
+        .courseclass-card {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .courseclass-card-header {
+            background-color: #162f5f;
+            color: #ffffff;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .courseclass-card-header h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+
+        .btn-add-courseclass {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #111827;
+            background-color: #ffffff;
+            border: none;
+            text-decoration: none;
+        }
+
+            .btn-add-courseclass:hover {
+                background-color: #f3f4f6;
+                color: #111827;
+            }
+
+        .courseclass-search-box {
+            padding: 14px 16px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+            .courseclass-search-box input {
+                height: 42px;
+                border-radius: 6px;
+                border: 1px solid #cfd8e3;
+                font-size: 15px;
+            }
+
+                .courseclass-search-box input:focus {
+                    border-color: #9bb7df;
+                    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+                }
+
+        .courseclass-table {
+            font-size: 14px;
+        }
+
+            .courseclass-table thead th {
+                background-color: #f5f6fa;
+                color: #687386;
+                font-weight: 700;
+                text-transform: uppercase;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 14px 16px;
+                vertical-align: middle;
+            }
+
+            .courseclass-table tbody td {
+                padding: 14px 16px;
+                vertical-align: middle;
+                color: #26364a;
+                border-bottom: 1px solid #edf0f3;
+            }
+
+            .courseclass-table tbody tr:hover {
+                background-color: #f8fafc;
+            }
+
+        .courseclass-code {
+            color: #26364a;
+        }
+
+        .btn-edit {
+            background-color: #dbeafe;
+            color: #1f3b73;
+            border: none;
+            min-width: 72px;
+            border-radius: 6px;
+            margin-right: 6px;
+        }
+
+            .btn-edit:hover {
+                background-color: #c7dbfb;
+                color: #1f3b73;
+            }
+
+        .btn-delete {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: none;
+            min-width: 72px;
+            border-radius: 6px;
+        }
+
+            .btn-delete:hover {
+                background-color: #e5e7eb;
+                color: #111827;
+            }
+    </style>
+
+    @section Scripts {
+        <script>
+$(document).ready(function () {
+$("#searchCourseClass").on("keyup", function () {
+var keyword = $(this).val().toLowerCase().trim();
+
+            $("#courseClassTable tbody tr").each(function () {
+                var rowText = $(this).data("search");
+
+                if (rowText === undefined) {
+                    return;
+                }
+
+                if (rowText.indexOf(keyword) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
             });
         });
 
-        $(".btnEditCourseClass").click(function () {
-            var id = $(this).data("id");
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                alert(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]?.ToString())));
+            </text>
+        }
 
-            $.get("/CourseClassManagement/EditModal/" + id, function (data) {
-                $("#courseClassModalLabel").text("Sửa lớp học phần");
-                $("#courseClassModalBody").html(data);
-                $("#courseClassModal").modal("show");
-            });
-        });
-    });</script>
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                alert(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]?.ToString())));
+            </text>
+        }
+    });
+        </script>
 
     }

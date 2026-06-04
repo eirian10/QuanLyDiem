@@ -1,91 +1,172 @@
 ﻿@model IEnumerable<QuanLyDiem.Models.Subject>
 
-@{
-    ViewData["Title"] = "Quản lý môn học";
-}
+    @{
+ViewData["Title"] = "Quản lý môn học";
+    }
 
-<h2 class="mb-3">Quản lý môn học</h2>
-
-<button type="button" class="btn btn-primary mb-3" id="btnCreateSubject">
-    Thêm môn học
-</button>
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Mã môn học</th>
-            <th>Tên môn học</th>
-            <th>Số tín chỉ</th>
-            <th>Trọng số quá trình</th>
-            <th>Trọng số cuối kỳ</th>
-            <th style="width: 180px;">Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.SubjectCode</td>
-                <td>@item.SubjectName</td>
-                <td>@item.Credits</td>
-                <td>@item.ProcessWeight</td>
-                <td>@item.FinalWeight</td>
-                <td>
-                    <button type="button"
-                            class="btn btn-sm btn-warning btnEditSubject"
-                            data-id="@item.SubjectId">
-                        Sửa
-                    </button>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@item.SubjectId"
-                       class="btn btn-sm btn-danger">
-                        Xóa
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<div class="modal fade" id="subjectModal" tabindex="-1" aria-labelledby="subjectModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 id="subjectModalLabel" class="modal-title">Thông tin môn học</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+    <div class="subject-page-wrapper">
+        <div class="subject-card">
+            <div class="subject-card-header">
+                <h3>DANH SÁCH MÔN HỌC</h3>
+                <a asp-action="Create" class="btn btn-light btn-add-subject">
+                    + Thêm môn học
+                </a>
             </div>
 
-            <div class="modal-body" id="subjectModalBody">
+            <div class="table-responsive">
+                <table class="table subject-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Mã môn</th>
+                            <th>Tên môn</th>
+                            <th class="text-center">Tín chỉ</th>
+                            <th class="text-center">Quá trình</th>
+                            <th class="text-center">Cuối kỳ</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold subject-code">@item.SubjectCode</td>
+                            <td>@item.SubjectName</td>
+                            <td class="text-center">@item.Credits</td>
+                            <td class="text-center">@item.ProcessWeight</td>
+                            <td class="text-center">@item.FinalWeight</td>
+                            <td class="text-center">
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.SubjectId"
+                                   class="btn btn-sm btn-edit">
+                                    Sửa
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.SubjectId"
+                                   class="btn btn-sm btn-delete">
+                                    Xóa
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Chưa có môn học nào
+                            </td>
+                        </tr>
+                }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</div>
+    <style>
+        .subject-page-wrapper {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            min-height: 640px;
+        }
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+        .subject-card {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
 
-    <script>
-        $(document).ready(function () {
-            $("#btnCreateSubject").click(function () {
-                $.get("/Subjects/CreateModal", function (data) {
-                    $("#subjectModalLabel").text("Thêm môn học");
-                    $("#subjectModalBody").html(data);
-                    $("#subjectModal").modal("show");
-                });
-            });
+        .subject-card-header {
+            background-color: #162f5f;
+            color: #ffffff;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-            $(".btnEditSubject").click(function () {
-                var id = $(this).data("id");
+            .subject-card-header h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
 
-                $.get("/Subjects/EditModal/" + id, function (data) {
-                    $("#subjectModalLabel").text("Sửa môn học");
-                    $("#subjectModalBody").html(data);
-                    $("#subjectModal").modal("show");
-                });
-            });
-        });
-    </script>
-}
+        .btn-add-subject {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #111827;
+            background-color: #ffffff;
+            border: none;
+            text-decoration: none;
+        }
+
+            .btn-add-subject:hover {
+                background-color: #f3f4f6;
+                color: #111827;
+            }
+
+        .subject-table {
+            font-size: 14px;
+        }
+
+            .subject-table thead th {
+                background-color: #f5f6fa;
+                color: #687386;
+                font-weight: 700;
+                text-transform: uppercase;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 14px 16px;
+                vertical-align: middle;
+            }
+
+            .subject-table tbody td {
+                padding: 14px 16px;
+                vertical-align: middle;
+                color: #26364a;
+                border-bottom: 1px solid #edf0f3;
+            }
+
+            .subject-table tbody tr:hover {
+                background-color: #f8fafc;
+            }
+
+        .subject-code {
+            color: #26364a;
+        }
+
+        .btn-edit {
+            background-color: #dbeafe;
+            color: #1f3b73;
+            border: none;
+            min-width: 72px;
+            border-radius: 6px;
+            margin-right: 6px;
+        }
+
+            .btn-edit:hover {
+                background-color: #c7dbfb;
+                color: #1f3b73;
+            }
+
+        .btn-delete {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: none;
+            min-width: 72px;
+            border-radius: 6px;
+        }
+
+            .btn-delete:hover {
+                background-color: #e5e7eb;
+                color: #111827;
+            }
+    </style>
