@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using QuanLyDiem.Data;
 using QuanLyDiem.Models;
+using QuanLyDiem.Services;
 
 namespace QuanLyDiem.Controllers
 {
     [Route("Subjects")]
     public class SubjectsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly SubjectService _subjectService;
 
-        public SubjectsController(ApplicationDbContext context)
+        public SubjectsController(SubjectService subjectService)
         {
-            _context = context;
+            _subjectService = subjectService;
         }
 
         // GET: /Subjects
@@ -21,10 +20,7 @@ namespace QuanLyDiem.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            var subjects = await _context.Subjects
-                .OrderBy(s => s.SubjectCode)
-                .ToListAsync();
-
+            var subjects = await _subjectService.GetAllAsync();
             return View(subjects);
         }
 
@@ -47,19 +43,16 @@ namespace QuanLyDiem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Subject subject)
         {
-            ValidateSubjectWeights(subject);
-
-            if (await IsSubjectCodeDuplicated(subject.SubjectCode))
-            {
-                ModelState.AddModelError(nameof(subject.SubjectCode), "Mã môn học đã tồn tại.");
-            }
-
             if (ModelState.IsValid)
             {
-                _context.Subjects.Add(subject);
-                await _context.SaveChangesAsync();
+                var result = await _subjectService.CreateAsync(subject);
 
-                return RedirectToAction(nameof(Index));
+                if (result.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                AddSubjectErrorToModelState(result.ErrorMessage);
             }
 
             return View(subject);
@@ -69,7 +62,7 @@ namespace QuanLyDiem.Controllers
         [HttpGet("Edit/{id:int}")]
         public async Task<IActionResult> Edit(int id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
+            var subject = await _subjectService.GetByIdAsync(id);
 
             if (subject == null)
             {
@@ -83,7 +76,7 @@ namespace QuanLyDiem.Controllers
         [HttpGet("EditModal/{id:int}")]
         public async Task<IActionResult> EditModal(int id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
+            var subject = await _subjectService.GetByIdAsync(id);
 
             if (subject == null)
             {
@@ -98,36 +91,16 @@ namespace QuanLyDiem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Subject subject)
         {
-            if (id != subject.SubjectId)
-            {
-                return NotFound();
-            }
-
-            ValidateSubjectWeights(subject);
-
-            if (await IsSubjectCodeDuplicated(subject.SubjectCode, subject.SubjectId))
-            {
-                ModelState.AddModelError(nameof(subject.SubjectCode), "Mã môn học đã tồn tại.");
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Subjects.Update(subject);
-                    await _context.SaveChangesAsync();
+                var result = await _subjectService.UpdateAsync(id, subject);
 
+                if (result.IsSuccess)
+                {
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await SubjectExists(subject.SubjectId))
-                    {
-                        return NotFound();
-                    }
 
-                    throw;
-                }
+                AddSubjectErrorToModelState(result.ErrorMessage);
             }
 
             return View(subject);
@@ -137,8 +110,7 @@ namespace QuanLyDiem.Controllers
         [HttpGet("Delete/{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var subject = await _context.Subjects
-                .FirstOrDefaultAsync(s => s.SubjectId == id);
+            var subject = await _subjectService.GetByIdAsync(id);
 
             if (subject == null)
             {
@@ -153,43 +125,31 @@ namespace QuanLyDiem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var subject = await _context.Subjects.FindAsync(id);
+            var isDeleted = await _subjectService.DeleteAsync(id);
 
-            if (subject == null)
+            if (!isDeleted)
             {
                 return NotFound();
             }
 
-            _context.Subjects.Remove(subject);
-            await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 
-        private void ValidateSubjectWeights(Subject subject)
+        private void AddSubjectErrorToModelState(string? errorMessage)
         {
-            const double epsilon = 0.0001;
-
-            if (Math.Abs((subject.ProcessWeight + subject.FinalWeight) - 1.0) > epsilon)
+            if (string.IsNullOrWhiteSpace(errorMessage))
             {
-                ModelState.AddModelError(
-                    "",
-                    "Tổng trọng số điểm quá trình và điểm cuối kỳ phải bằng 1. Ví dụ: 0.4 + 0.6 = 1."
-                );
+                return;
             }
-        }
 
-        private async Task<bool> IsSubjectCodeDuplicated(string subjectCode, int? currentSubjectId = null)
-        {
-            return await _context.Subjects.AnyAsync(s =>
-                s.SubjectCode == subjectCode &&
-                (!currentSubjectId.HasValue || s.SubjectId != currentSubjectId.Value)
-            );
-        }
+            if (errorMessage.Contains("Mã môn học"))
+            {
+                ModelState.AddModelError(nameof(Subject.SubjectCode), errorMessage);
+                return;
+            }
 
-        private async Task<bool> SubjectExists(int id)
-        {
-            return await _context.Subjects.AnyAsync(s => s.SubjectId == id);
+            ModelState.AddModelError("", errorMessage);
         }
     }
+
 }

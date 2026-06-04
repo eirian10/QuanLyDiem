@@ -1,37 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using QuanLyDiem.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuanLyDiem.Models;
+using QuanLyDiem.Services;
 
 namespace QuanLyDiem.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("CourseClassManagement")]
     public class CourseClassManagementController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly CourseClassManagementService _courseClassService;
 
-        public CourseClassManagementController(ApplicationDbContext context)
+        public CourseClassManagementController(CourseClassManagementService courseClassService)
         {
-            _context = context;
+            _courseClassService = courseClassService;
         }
 
-        // GET: /CourseClassManagement
         [HttpGet("")]
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            var courseClasses = await _context.CourseClasses
-                .Include(c => c.Semester)
-                .Include(c => c.Subject)
-                .Include(c => c.Lecturer)
-                .OrderBy(c => c.ClassCode)
-                .ToListAsync();
-
+            var courseClasses = await _courseClassService.GetAllAsync();
             return View(courseClasses);
         }
 
-        // GET: /CourseClassManagement/Create
         [HttpGet("Create")]
         public IActionResult Create()
         {
@@ -39,41 +31,30 @@ namespace QuanLyDiem.Controllers
             return View();
         }
 
-        // GET: /CourseClassManagement/CreateModal
-        [HttpGet("CreateModal")]
-        public IActionResult CreateModal()
-        {
-            LoadDropdowns();
-            return PartialView("_CourseClassForm", new CourseClass());
-        }
-
-        // POST: /CourseClassManagement/Create
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CourseClass courseClass)
         {
-            if (await IsClassCodeDuplicated(courseClass.ClassCode))
-            {
-                ModelState.AddModelError(nameof(courseClass.ClassCode), "Mã lớp học phần đã tồn tại.");
-            }
-
             if (ModelState.IsValid)
             {
-                _context.CourseClasses.Add(courseClass);
-                await _context.SaveChangesAsync();
+                var result = await _courseClassService.CreateAsync(courseClass);
 
-                return RedirectToAction(nameof(Index));
+                if (result.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                AddCourseClassErrorToModelState(result.ErrorMessage);
             }
 
             LoadDropdowns(courseClass.SubjectId, courseClass.SemesterId, courseClass.LecturerId);
             return View(courseClass);
         }
 
-        // GET: /CourseClassManagement/Edit/1
         [HttpGet("Edit/{id:int}")]
         public async Task<IActionResult> Edit(int id)
         {
-            var courseClass = await _context.CourseClasses.FindAsync(id);
+            var courseClass = await _courseClassService.GetByIdAsync(id);
 
             if (courseClass == null)
             {
@@ -84,140 +65,80 @@ namespace QuanLyDiem.Controllers
             return View(courseClass);
         }
 
-        // GET: /CourseClassManagement/EditModal/1
-        [HttpGet("EditModal/{id:int}")]
-        public async Task<IActionResult> EditModal(int id)
-        {
-            var courseClass = await _context.CourseClasses.FindAsync(id);
-
-            if (courseClass == null)
-            {
-                return NotFound();
-            }
-
-            LoadDropdowns(courseClass.SubjectId, courseClass.SemesterId, courseClass.LecturerId);
-            return PartialView("_CourseClassForm", courseClass);
-        }
-
-        // POST: /CourseClassManagement/Edit/1
         [HttpPost("Edit/{id:int}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CourseClass courseClass)
         {
-            if (id != courseClass.CourseClassId)
-            {
-                return NotFound();
-            }
-
-            if (await IsClassCodeDuplicated(courseClass.ClassCode, courseClass.CourseClassId))
-            {
-                ModelState.AddModelError(nameof(courseClass.ClassCode), "Mã lớp học phần đã tồn tại.");
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.CourseClasses.Update(courseClass);
-                    await _context.SaveChangesAsync();
+                var result = await _courseClassService.UpdateAsync(id, courseClass);
 
+                if (result.IsSuccess)
+                {
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await CourseClassExists(courseClass.CourseClassId))
-                    {
-                        return NotFound();
-                    }
 
-                    throw;
-                }
+                AddCourseClassErrorToModelState(result.ErrorMessage);
             }
 
             LoadDropdowns(courseClass.SubjectId, courseClass.SemesterId, courseClass.LecturerId);
             return View(courseClass);
         }
 
-        // GET: /CourseClassManagement/Delete/1
-        [HttpGet("Delete/{id:int}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var courseClass = await _context.CourseClasses
-                .Include(c => c.Semester)
-                .Include(c => c.Subject)
-                .Include(c => c.Lecturer)
-                .FirstOrDefaultAsync(c => c.CourseClassId == id);
-
-            if (courseClass == null)
-            {
-                return NotFound();
-            }
-
-            return View(courseClass);
-        }
-
-        // POST: /CourseClassManagement/Delete/1
         [HttpPost("Delete/{id:int}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var courseClass = await _context.CourseClasses.FindAsync(id);
+            var result = await _courseClassService.DeleteAsync(id);
 
-            if (courseClass == null)
+            if (result.IsSuccess)
             {
-                return NotFound();
+                TempData["Success"] = "Xóa lớp học phần thành công.";
             }
-
-            _context.CourseClasses.Remove(courseClass);
-            await _context.SaveChangesAsync();
+            else
+            {
+                TempData["Error"] = result.ErrorMessage ?? "Không thể xóa lớp học phần.";
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
         private void LoadDropdowns(int? selectedSubjectId = null, int? selectedSemesterId = null, int? selectedLecturerId = null)
         {
-            ViewData["SubjectId"] = new SelectList(
-                _context.Subjects.OrderBy(s => s.SubjectName),
-                "SubjectId",
-                "SubjectName",
-                selectedSubjectId
-            );
-
-            ViewData["SemesterId"] = new SelectList(
-                _context.Semesters
-                    .OrderBy(s => s.AcademicYear)
-                    .ThenBy(s => s.Term)
-                    .Select(s => new
-                    {
-                        s.SemesterId,
-                        DisplayName = s.Term + " - " + s.AcademicYear
-                    }),
-                "SemesterId",
-                "DisplayName",
-                selectedSemesterId
-            );
-
-            ViewData["LecturerId"] = new SelectList(
-                _context.Users
-                    .Where(u => u.Role == "Lecturer")
-                    .OrderBy(u => u.FullName),
-                "UserId",
-                "FullName",
-                selectedLecturerId
-            );
+            ViewData["SubjectId"] = _courseClassService.GetSubjectSelectList(selectedSubjectId);
+            ViewData["SemesterId"] = _courseClassService.GetSemesterSelectList(selectedSemesterId);
+            ViewData["LecturerId"] = _courseClassService.GetLecturerSelectList(selectedLecturerId);
         }
 
-        private async Task<bool> IsClassCodeDuplicated(string classCode, int? currentCourseClassId = null)
+        private void AddCourseClassErrorToModelState(string? errorMessage)
         {
-            return await _context.CourseClasses.AnyAsync(c =>
-                c.ClassCode == classCode &&
-                (!currentCourseClassId.HasValue || c.CourseClassId != currentCourseClassId.Value)
-            );
-        }
+            if (string.IsNullOrWhiteSpace(errorMessage))
+            {
+                return;
+            }
 
-        private async Task<bool> CourseClassExists(int id)
-        {
-            return await _context.CourseClasses.AnyAsync(c => c.CourseClassId == id);
+            var lowerError = errorMessage.ToLower();
+
+            if (lowerError.Contains("mã lớp"))
+            {
+                ModelState.AddModelError(nameof(CourseClass.ClassCode), errorMessage);
+            }
+            else if (lowerError.Contains("học kỳ"))
+            {
+                ModelState.AddModelError(nameof(CourseClass.SemesterId), errorMessage);
+            }
+            else if (lowerError.Contains("môn học") || lowerError.Contains("đổi môn học"))
+            {
+                ModelState.AddModelError(nameof(CourseClass.SubjectId), errorMessage);
+            }
+            else if (lowerError.Contains("giảng viên"))
+            {
+                ModelState.AddModelError(nameof(CourseClass.LecturerId), errorMessage);
+            }
+            else
+            {
+                ModelState.AddModelError("", errorMessage);
+            }
         }
     }
 }

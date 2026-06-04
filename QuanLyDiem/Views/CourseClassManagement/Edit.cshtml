@@ -4,46 +4,162 @@
     ViewData["Title"] = "Sửa lớp học phần";
 }
 
-<h2 class="mb-3">Sửa lớp học phần</h2>
+<div class="courseclass-form-page-wrapper">
+    <div class="courseclass-form-card">
+        <div class="courseclass-form-header">
+            <h3>THÔNG TIN LỚP HỌC PHẦN</h3>
+        </div>
 
-<form asp-action="Edit" asp-route-id="@Model.CourseClassId" method="post">
-    <input type="hidden" asp-for="CourseClassId" />
+        <div class="courseclass-form-body">
+            <form asp-action="Edit" asp-route-id="@Model.CourseClassId" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="CourseClassId" />
 
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="mb-3">
-        <label asp-for="ClassCode" class="form-label">Mã lớp học phần</label>
-        <input asp-for="ClassCode" class="form-control" />
-        <span asp-validation-for="ClassCode" class="text-danger"></span>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label asp-for="ClassCode" class="form-label">Mã lớp học phần</label>
+                        <input asp-for="ClassCode" class="form-control custom-input" />
+                        <span asp-validation-for="ClassCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SubjectId" class="form-label">Môn học</label>
+                        <select asp-for="SubjectId" asp-items="ViewBag.SubjectId" class="form-select custom-input">
+                            <option value="">-- Chọn môn học --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="LecturerId" class="form-label">Giảng viên</label>
+                        <select asp-for="LecturerId" asp-items="ViewBag.LecturerId" class="form-select custom-input">
+                            <option value="">-- Chọn giảng viên --</option>
+                        </select>
+                        <span asp-validation-for="LecturerId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SemesterId" class="form-label">Học kỳ</label>
+                        <select asp-for="SemesterId" asp-items="ViewBag.SemesterId" class="form-select custom-input">
+                            <option value="">-- Chọn học kỳ --</option>
+                        </select>
+                        <span asp-validation-for="SemesterId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr class="form-divider" />
+
+                <div class="form-action-group">
+                    <button type="submit" class="btn btn-save-courseclass">
+                        Lưu lớp học phần
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-back-courseclass">
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="SemesterId" class="form-label">Học kỳ</label>
-        <select asp-for="SemesterId" class="form-select" asp-items="ViewBag.SemesterId">
-            <option value="">-- Chọn học kỳ --</option>
-        </select>
-        <span asp-validation-for="SemesterId" class="text-danger"></span>
-    </div>
+<style>
+    .courseclass-form-page-wrapper {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 24px;
+        min-height: 640px;
+    }
 
-    <div class="mb-3">
-        <label asp-for="SubjectId" class="form-label">Môn học</label>
-        <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.SubjectId">
-            <option value="">-- Chọn môn học --</option>
-        </select>
-        <span asp-validation-for="SubjectId" class="text-danger"></span>
-    </div>
+    .courseclass-form-card {
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+    }
 
-    <div class="mb-3">
-        <label asp-for="LecturerId" class="form-label">Giảng viên phụ trách</label>
-        <select asp-for="LecturerId" class="form-select" asp-items="ViewBag.LecturerId">
-            <option value="">-- Chọn giảng viên --</option>
-        </select>
-        <span asp-validation-for="LecturerId" class="text-danger"></span>
-    </div>
+    .courseclass-form-header {
+        background-color: #162f5f;
+        color: #ffffff;
+        padding: 16px 20px;
+    }
 
-    <button type="submit" class="btn btn-primary">Cập nhật</button>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-</form>
+        .courseclass-form-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+    .courseclass-form-body {
+        padding: 28px 24px 22px 24px;
+    }
+
+    .custom-input {
+        height: 42px;
+        border-radius: 6px;
+        border: 1px solid #cfd8e3;
+        font-size: 15px;
+        color: #26364a;
+    }
+
+        .custom-input:focus {
+            border-color: #9bb7df;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+        }
+
+    .form-label {
+        font-weight: 500;
+        color: #26364a;
+        margin-bottom: 8px;
+    }
+
+    .form-divider {
+        margin: 26px 0 20px 0;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .form-action-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn-save-courseclass {
+        background-color: #162f5f;
+        color: #ffffff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-weight: 600;
+        min-width: 160px;
+    }
+
+        .btn-save-courseclass:hover {
+            background-color: #10264d;
+            color: #ffffff;
+        }
+
+    .btn-back-courseclass {
+        background-color: #e5e7eb;
+        color: #374151;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+        min-width: 95px;
+        text-align: center;
+    }
+
+        .btn-back-courseclass:hover {
+            background-color: #d1d5db;
+            color: #111827;
+        }
+</style>
 
 @section Scripts {
     @{

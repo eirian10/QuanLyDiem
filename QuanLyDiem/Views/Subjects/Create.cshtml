@@ -4,46 +4,135 @@
     ViewData["Title"] = "Thêm môn học";
 }
 
-<h2 class="mb-3">Thêm môn học</h2>
+<div class="subject-page-wrapper">
+    <div class="subject-form-card">
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="subject-form-header">
+            <h3>THÔNG TIN MÔN HỌC</h3>
+        </div>
 
-    <div class="mb-3">
-        <label asp-for="SubjectCode" class="form-label">Mã môn học</label>
-        <input asp-for="SubjectCode" class="form-control" />
-        <span asp-validation-for="SubjectCode" class="text-danger"></span>
+        <div class="subject-form-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="SubjectCode" class="form-label">Mã môn học</label>
+                        <input asp-for="SubjectCode" class="form-control custom-input" />
+                        <span asp-validation-for="SubjectCode" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="SubjectName" class="form-label">Tên môn học</label>
+                        <input asp-for="SubjectName" class="form-control custom-input" />
+                        <span asp-validation-for="SubjectName" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <label asp-for="Credits" class="form-label">Số tín chỉ</label>
+                        <input asp-for="Credits"
+                               class="form-control custom-input"
+                               type="number"
+                               min="1"
+                               max="6" />
+                        <span asp-validation-for="Credits" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ProcessWeight" class="form-label">Trọng số quá trình</label>
+                        <input asp-for="ProcessWeight"
+                               class="form-control custom-input"
+                               type="number"
+                               min="0"
+                               max="1"
+                               step="0.1" />
+                        <span asp-validation-for="ProcessWeight" class="text-danger small"></span>
+                        <small class="text-muted">Nhập từ 0.0 đến 1.0. Ví dụ: 0.4</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="FinalWeight" class="form-label">Trọng số cuối kỳ</label>
+                        <input asp-for="FinalWeight"
+                               class="form-control custom-input"
+                               type="number"
+                               min="0"
+                               max="1"
+                               step="0.1" />
+                        <span asp-validation-for="FinalWeight" class="text-danger small"></span>
+                        <small class="text-muted">Nhập từ 0.0 đến 1.0. Ví dụ: 0.6</small>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4">
+                        Lưu môn học
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary px-4">
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="SubjectName" class="form-label">Tên môn học</label>
-        <input asp-for="SubjectName" class="form-control" />
-        <span asp-validation-for="SubjectName" class="text-danger"></span>
-    </div>
+<style>
+    .subject-page-wrapper {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 24px;
+        min-height: 640px;
+    }
 
-    <div class="mb-3">
-        <label asp-for="Credits" class="form-label">Số tín chỉ</label>
-        <input asp-for="Credits" class="form-control" type="number" min="1" max="6" />
-        <span asp-validation-for="Credits" class="text-danger"></span>
-    </div>
+    .subject-form-card {
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #d9dee7;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
 
-    <div class="mb-3">
-        <label asp-for="ProcessWeight" class="form-label">Trọng số điểm quá trình</label>
-        <input asp-for="ProcessWeight" class="form-control" type="number" step="0.1" min="0" max="1" />
-        <span asp-validation-for="ProcessWeight" class="text-danger"></span>
-        <small class="text-muted">Ví dụ: 0.4 nghĩa là 40%</small>
-    </div>
+    .subject-form-header {
+        background-color: #162f5f;
+        color: white;
+        padding: 14px 20px;
+    }
 
-    <div class="mb-3">
-        <label asp-for="FinalWeight" class="form-label">Trọng số điểm cuối kỳ</label>
-        <input asp-for="FinalWeight" class="form-control" type="number" step="0.1" min="0" max="1" />
-        <span asp-validation-for="FinalWeight" class="text-danger"></span>
-        <small class="text-muted">Ví dụ: 0.6 nghĩa là 60%</small>
-    </div>
+        .subject-form-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
 
-    <button type="submit" class="btn btn-primary">Lưu</button>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-</form>
+    .subject-form-body {
+        padding: 24px;
+    }
+
+    .custom-input {
+        height: 42px;
+        border-radius: 6px;
+        border: 1px solid #cfd8e3;
+    }
+
+        .custom-input:focus {
+            border-color: #9bb7df;
+            box-shadow: none;
+        }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #2d3a4b;
+    }
+</style>
 
 @section Scripts {
     @{
