@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyDiem.Controllers
 {
-    [Authorize(Roles = "Admin,Lecturer")] // Chỉ cho tài khoản có quyền giảng viên truy cập
+    [Authorize(Roles = "Admin,Lecturer")] // Chỉ cho tài khoản có quyền Admin hoặc Giảng viên truy cập
     public class EnrollmentsController : Controller
     {
         private readonly EnrollmentService _enrollmentService;
@@ -16,26 +16,32 @@ namespace QuanLyDiem.Controllers
             _enrollmentService = enrollmentService;
         }
 
-        // 1. Xem danh sách các lớp học phần được phân công
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? semesterId)
         {
-            // Kiểm tra nếu người dùng hiện tại có Role là Admin
+            ViewBag.SelectedSemesterId = semesterId;
+
+            // GỌI QUA SERVICE: Lấy danh sách học kỳ đẩy vào ViewBag để làm bộ lọc động
+            ViewBag.Semesters = await _enrollmentService.GetAllSemestersAsync();
+
+            // Khối xử lý phân quyền lấy danh sách lớp học phần giữ nguyên
             if (User.IsInRole("Admin"))
             {
-                var allDbClasses = await _enrollmentService.GetAllClassesAsync();
+                var allDbClasses = await _enrollmentService.GetAllClassesAsync(semesterId);
                 return View(allDbClasses);
             }
 
-            // Nếu không phải Admin thì xử lý luồng lấy lớp của Giảng viên như cũ
             var userIdClaim = User.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int lecturerId))
             {
                 return Challenge();
             }
 
-            var lecturerClasses = await _enrollmentService.GetLecturerClassesAsync(lecturerId);
+            var lecturerClasses = await _enrollmentService.GetLecturerClassesAsync(lecturerId, semesterId);
             return View(lecturerClasses);
         }
+
+        // Các hàm Details, AddStudentManual, ImportExcel, RemoveStudent bên dưới giữ nguyên...
+    
 
         // 2. Xem chi tiết danh sách sinh viên trong lớp
         public async Task<IActionResult> Details(int id)

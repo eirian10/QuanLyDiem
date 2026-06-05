@@ -13,6 +13,29 @@
         padding-bottom: 8px;
     }
 
+    /* Khối cấu trúc bộ lọc học kỳ */
+    .filter-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .form-select-custom {
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-size: 14px;
+        padding: 8px 12px;
+        font-weight: 500;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-select-custom:focus {
+            border-color: #162a52;
+            box-shadow: 0 0 0 3px rgba(22, 42, 82, 0.1);
+            outline: none;
+        }
+
     /* Tinh chỉnh bảng dữ liệu theo tone màu EduGrade */
     .custom-table {
         background-color: #ffffff;
@@ -99,6 +122,42 @@
         </h2>
     </div>
 
+    <div class="card filter-card shadow-sm mb-4">
+        <div class="card-body py-3 px-4">
+            <form method="get" action="@Url.Action("Index", "Enrollments")" class="row align-items-center">
+                <div class="col-auto">
+                    <label class="form-label font-weight-bold m-0 text-secondary" style="font-size: 14px;">
+                        <i class="fas fa-filter me-1.5 text-warning"></i>
+                    </label>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <select name="semesterId" class="form-select form-select-custom w-100" onchange="this.form.submit()">
+                        <option value="">-- Hiển thị tất cả --</option>
+
+                        @if (ViewBag.Semesters != null)
+                        {
+                            foreach (var sem in ViewBag.Semesters as List<QuanLyDiem.Models.Semester>)
+                            {
+                                <option value="@sem.SemesterId"
+                                        selected="@(ViewBag.SelectedSemesterId == sem.SemesterId ? "selected" : null)">
+                                    Học kỳ @sem.Term — Năm học @sem.AcademicYear
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                @if (ViewBag.SelectedSemesterId != null)
+                {
+                    <div class="col-auto ps-0">
+                        <a href="@Url.Action("Index", "Enrollments")" class="btn btn-sm btn-link text-decoration-none text-danger" style="font-size: 13px;">
+                            <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                        </a>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+
     <table class="table custom-table align-middle shadow-sm">
         <thead>
             <tr>
@@ -137,7 +196,7 @@
                 <tr>
                     <td colspan="5" class="text-center text-muted py-5">
                         <i class="fas fa-folder-open fs-2 d-block mb-2 opacity-50"></i>
-                        Không tìm thấy dữ liệu lớp học phần được phân công trong hệ thống.
+                        Không tìm thấy dữ liệu lớp học phần tương ứng trong hệ thống.
                     </td>
                 </tr>
             }

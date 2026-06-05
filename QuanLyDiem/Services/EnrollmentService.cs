@@ -19,24 +19,54 @@ namespace QuanLyDiem.Services
             _context = context;
         }
 
-        // Lấy danh sách lớp học phần của giảng viên cụ thể
-        public async Task<List<CourseClass>> GetLecturerClassesAsync(int lecturerId)
+        /// <summary>
+        /// Lấy danh sách lớp học phần của một giảng viên - Có hỗ trợ lọc theo Học kỳ
+        /// </summary>
+        public async Task<List<CourseClass>> GetLecturerClassesAsync(int lecturerId, int? semesterId = null)
         {
-            return await _context.CourseClasses
+            var query = _context.CourseClasses
                 .Include(c => c.Semester)
                 .Include(c => c.Subject)
-                .Where(c => c.LecturerId == lecturerId)
+                .Where(c => c.LecturerId == lecturerId).AsQueryable();
+
+            // Nếu truyền semesterId thì tiến hành lọc theo học kỳ đó
+            if (semesterId.HasValue)
+            {
+                query = query.Where(c => c.SemesterId == semesterId.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+
+        /// <summary>
+        /// Dành cho admin: Lấy tất cả lớp học phần trên hệ thống - Có hỗ trợ lọc theo Học kỳ
+        /// </summary>
+        ///         // Lấy danh sách tất cả các lớp sinh hoạt để nạp vào Dropdown tương tác trên View
+        public async Task<List<Semester>> GetAllSemestersAsync()
+        {
+            return await _context.Semesters
+                .OrderByDescending(s => s.AcademicYear) // Năm học mới nhất xếp lên đầu
+                .ThenBy(s => s.Term)                  // Sắp xếp theo HK1, HK2, HK3
                 .ToListAsync();
         }
-        //Danh cho admin 
-        public async Task<List<CourseClass>> GetAllClassesAsync()
+        public async Task<List<CourseClass>> GetAllClassesAsync(int? semesterId = null)
         {
-            return await _context.CourseClasses
+            var query = _context.CourseClasses
                 .Include(c => c.Semester)
-                .Include(c => c.Subject)
-                .ToListAsync(); // Không lọc Where theo LecturerId nữa!
+                .Include(c => c.Subject).AsQueryable();
+
+            // Nếu truyền semesterId thì tiến hành lọc theo học kỳ đó
+            if (semesterId.HasValue)
+            {
+                query = query.Where(c => c.SemesterId == semesterId.Value);
+            }
+
+            return await query.ToListAsync();
         }
-        // Lấy thông tin chung của lớp học phần
+
+        /// <summary>
+        /// Lấy thông tin chi tiết của một lớp học phần
+        /// </summary>
         public async Task<CourseClass?> GetClassDetailsAsync(int classId)
         {
             return await _context.CourseClasses
@@ -44,34 +74,51 @@ namespace QuanLyDiem.Services
                 .FirstOrDefaultAsync(c => c.CourseClassId == classId);
         }
 
-        // Lấy danh sách học viên của lớp: Sắp xếp theo StudentCode (Tăng dần), Họ tên, Ngày sinh, Lớp sinh hoạt
+        /// <summary>
+        /// Lấy danh sách sinh viên trong lớp học phần (Sắp xếp tăng dần theo Mã sinh viên)
+        /// </summary>
         public async Task<List<Student>> GetClassStudentsAsync(int classId)
         {
             return await _context.Enrollments
                 .Include(e => e.Student)
                     .ThenInclude(s => s.HomeroomClass)
                 .Where(e => e.CourseClassId == classId)
-                .OrderBy(e => e.Student.StudentCode) // Sắp xếp theo mã sinh viên tăng dần
+                .OrderBy(e => e.Student.StudentCode)
                 .Select(e => e.Student)
                 .ToListAsync();
         }
 
-        // Thêm sinh viên bằng tay qua Mã sinh viên
+        /// <summary>
+        /// Thêm sinh viên thủ công bằng Mã sinh viên (Đã sửa logic: Cho phép học lại/cải thiện ở học kỳ khác)
+        /// </summary>
         public async Task<(bool IsSuccess, string Message)> AddStudentManualAsync(int courseClassId, string studentCode)
         {
+            // 1. Kiểm tra sinh viên có tồn tại không
             var student = await _context.Students.FirstOrDefaultAsync(s => s.StudentCode == studentCode);
             if (student == null)
             {
                 return (false, "Không tìm thấy sinh viên với mã vừa nhập.");
             }
-            bool isAlreadyInSubject = await _context.Enrollments
-                .AnyAsync(e => e.StudentId == student.StudentId && e.CourseClass.SubjectId == _context.CourseClasses.FirstOrDefault(c => c.CourseClassId == courseClassId).SubjectId);
 
-            if (isAlreadyInSubject)
+            // 2. Lấy thông tin của lớp học phần hiện tại để lấy SubjectId và SemesterId
+            var currentClass = await _context.CourseClasses.FirstOrDefaultAsync(c => c.CourseClassId == courseClassId);
+            if (currentClass == null)
             {
-                return (false, "Sinh viên này đã có sẵn trong lớp học phần.");
+                return (false, "Lớp học phần không tồn tại trên hệ thống.");
             }
 
+            // 3. Logic mới: Chỉ chặn nếu trùng môn trong CÙNG MỘT HỌC KỲ (Hỗ trợ học lại / cải thiện ở học kỳ khác)
+            bool isAlreadyInSubjectThisSemester = await _context.Enrollments
+                .AnyAsync(e => e.StudentId == student.StudentId
+                            && e.CourseClass.SubjectId == currentClass.SubjectId
+                            && e.CourseClass.SemesterId == currentClass.SemesterId);
+
+            if (isAlreadyInSubjectThisSemester)
+            {
+                return (false, "Sinh viên này đã đăng ký lớp học khác cho môn học này trong cùng học kỳ.");
+            }
+
+            // 4. Hợp lệ thì tiến hành lưu vào DB
             var enrollment = new Enrollment { CourseClassId = courseClassId, StudentId = student.StudentId };
             _context.Enrollments.Add(enrollment);
             await _context.SaveChangesAsync();
@@ -79,7 +126,9 @@ namespace QuanLyDiem.Services
             return (true, "Thêm sinh viên vào lớp thành công!");
         }
 
-        // Import sinh viên từ Excel - Hiển thị chi tiết từng dòng bị lỗi
+        /// <summary>
+        /// Import danh sách sinh viên từ file Excel (Đã sửa logic: Cho phép học lại/cải thiện ở học kỳ khác)
+        /// </summary>
         public async Task<(bool IsSuccess, string Message)> ImportExcelAsync(int courseClassId, IFormFile excelFile)
         {
             if (excelFile == null || excelFile.Length == 0)
@@ -95,8 +144,6 @@ namespace QuanLyDiem.Services
 
             OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("Eirian");
             int countAdded = 0;
-
-            // Tạo một danh sách để chứa chi tiết các dòng bị lỗi
             var errorMessages = new List<string>();
 
             using (var stream = new MemoryStream())
@@ -122,17 +169,19 @@ namespace QuanLyDiem.Services
                             continue;
                         }
 
-                        // 2. Kiểm tra trùng theo môn học
-                        bool isAlreadyInSubject = await _context.Enrollments
-                            .AnyAsync(e => e.StudentId == student.StudentId && e.CourseClass.SubjectId == currentClass.SubjectId);
+                        // 2. Logic mới: Kiểm tra trùng môn trong CÙNG MỘT HỌC KỲ
+                        bool isAlreadyInSubjectThisSemester = await _context.Enrollments
+                            .AnyAsync(e => e.StudentId == student.StudentId
+                                        && e.CourseClass.SubjectId == currentClass.SubjectId
+                                        && e.CourseClass.SemesterId == currentClass.SemesterId);
 
-                        if (isAlreadyInSubject)
+                        if (isAlreadyInSubjectThisSemester)
                         {
-                            errorMessages.Add($"Dòng {row}: Sinh viên '{studentCode}' đã học môn này ở lớp khác.");
+                            errorMessages.Add($"Dòng {row}: Sinh viên '{studentCode}' đã học môn này ở lớp khác trong cùng học kỳ.");
                             continue;
                         }
 
-                        // 3. Nếu hợp lệ thì thêm vào danh sách chờ lưu
+                        // 3. Nếu hợp lệ thì thêm vào database
                         _context.Enrollments.Add(new Enrollment
                         {
                             CourseClassId = courseClassId,
@@ -149,19 +198,20 @@ namespace QuanLyDiem.Services
             }
 
             // --- XỬ LÝ KẾT QUẢ TRẢ VỀ ---
-            string tổngKết = $"Đã thêm thành công {countAdded} sinh viên.";
+            string tongKet = $"Đã thêm thành công {countAdded} sinh viên.";
 
-            // Nếu có lỗi, nối các câu lỗi lại thành các dòng xuống hàng (<br/>) để hiển thị lên giao diện
             if (errorMessages.Any())
             {
-                string chiTiếtLỗi = "<br/> Chi tiết các dòng bỏ qua:<br/>" + string.Join("<br/>", errorMessages);
-                return (true, tổngKết + chiTiếtLỗi);
+                string chiTietLoi = "<br/> Chi tiết các dòng bỏ qua:<br/>" + string.Join("<br/>", errorMessages);
+                return (true, tongKet + chiTietLoi);
             }
 
-            return (true, tổngKết);
+            return (true, tongKet);
         }
 
-        // Xóa sinh viên khỏi lớp học phần
+        /// <summary>
+        /// Xóa sinh viên khỏi lớp học phần
+        /// </summary>
         public async Task<(bool IsSuccess, string Message)> RemoveStudentAsync(int courseClassId, int studentId)
         {
             var enrollment = await _context.Enrollments
