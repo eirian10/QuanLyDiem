@@ -45,6 +45,7 @@ namespace QuanLyDiem.Services
 
             // 2. Phân trang dữ liệu dưới Database
             var data = await query
+                .OrderBy(s => s.StudentCode)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
