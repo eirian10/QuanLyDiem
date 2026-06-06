@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyDiem.Controllers
 {
-    [Authorize(Roles = "Admin,Lecturer")] // Chỉ cho tài khoản có quyền Admin hoặc Giảng viên truy cập
+    [Authorize(Roles = "Admin,Lecturer")] 
     public class EnrollmentsController : Controller
     {
         private readonly EnrollmentService _enrollmentService;
@@ -39,9 +39,6 @@ namespace QuanLyDiem.Controllers
             var lecturerClasses = await _enrollmentService.GetLecturerClassesAsync(lecturerId, semesterId);
             return View(lecturerClasses);
         }
-
-        // Các hàm Details, AddStudentManual, ImportExcel, RemoveStudent bên dưới giữ nguyên...
-    
 
         // 2. Xem chi tiết danh sách sinh viên trong lớp
         public async Task<IActionResult> Details(int id)
