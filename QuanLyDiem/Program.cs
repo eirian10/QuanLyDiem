@@ -18,7 +18,7 @@ builder.Services.AddScoped<IGradeService, GradeService>();
 builder.Services.AddScoped<EnrollmentService>();
 builder.Services.AddScoped<SubjectService>();
 builder.Services.AddScoped<CourseClassManagementService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -32,7 +32,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     });
-
+builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(5); });
 // MVC & Authorization Filter
 builder.Services.AddControllersWithViews(options =>
 {
@@ -56,7 +56,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
