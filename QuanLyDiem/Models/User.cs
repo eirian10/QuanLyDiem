@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace QuanLyDiem.Models
 {
@@ -13,8 +14,7 @@ namespace QuanLyDiem.Models
         [StringLength(50, ErrorMessage = "Tài khoản không quá 50 ký tự.")]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu không được để trống.")]
-        [MinLength(8, ErrorMessage = "Mật khẩu phải từ 8 ký tự trở lên.")]
+        [ValidateNever] // Bỏ qua validate phía client/form vì controller tự sinh ngẫu nhiên
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập họ tên")]
@@ -30,13 +30,11 @@ namespace QuanLyDiem.Models
 
         [ForeignKey("FacultyId")]
         public Faculty? Faculty { get; set; }
-
+        [ValidateNever]
         [Required]
         [RegularExpression("^(Admin|Lecturer)$", ErrorMessage = "Quyền phải là Admin hoặc Lecturer.")]
         public string Role { get; set; } = null!;
 
-        // Một giảng viên có thể phụ trách nhiều lớp
         public ICollection<CourseClass>? CourseClasses { get; set; } = new List<CourseClass>();
-
     }
 }

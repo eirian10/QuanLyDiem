@@ -1,0 +1,49 @@
+﻿.qnu-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    margin-top: 10px;
+}
+
+    .qnu-table thead th {
+        padding: 15px;
+        font-size: 13px;
+        color: #495057;
+        background: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .qnu-table tbody td {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 14px;
+        color: #333;
+    }
+
+/* Nút Sửa/Xóa */
+.btn-actions-cell {
+    display: flex;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-qnu-edit {
+    background-color: #d1e7fd;
+    color: #0d6efd;
+    padding: 5px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.btn-qnu-delete {
+    background-color: #f8d7da;
+    color: #dc3545;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}

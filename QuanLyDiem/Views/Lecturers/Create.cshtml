@@ -1,0 +1,63 @@
+﻿@model QuanLyDiem.Models.User
+
+<div class="lecturer-create-wrapper">
+    <div class="lecturer-card">
+        <div class="lecturer-card-header">
+            <h3>THÊM GIẢNG VIÊN MỚI</h3>
+        </div>
+
+       
+        <div asp-validation-summary="ModelOnly" class="text-danger p-3"></div>
+
+        <form asp-controller="Lecturers" asp-action="Create" method="post" class="p-4">
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tên đăng nhập</label>
+                    <input asp-for="Username" class="form-control"  />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Họ và Tên</label>
+                    <input asp-for="FullName" class="form-control"  />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email liên hệ</label>
+                <input asp-for="Email" type="email" class="form-control"  />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Khoa trực thuộc</label>
+                <select asp-for="FacultyId" asp-items="ViewBag.Faculties" class="form-select" >
+                    <option value="">-- Chọn khoa --</option>
+                </select>
+                <span asp-validation-for="FacultyId" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">Lưu thông tin giảng viên</button>
+                <a asp-action="Index" class="btn btn-secondary px-4">Quay lại danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .lecturer-create-wrapper { max-width: 800px; margin: 20px auto; }
+    .lecturer-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+    .lecturer-card-header { background-color: #162f5f; color: #fff; padding: 15px 20px; }
+    .lecturer-card-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+    .form-label { font-weight: 600; color: #374151; }
+    .btn-primary { background-color: #162f5f; border: none; }
+    .btn-primary:hover { background-color: #1e3a8a; }
+</style>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
