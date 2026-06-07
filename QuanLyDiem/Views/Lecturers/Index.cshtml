@@ -5,6 +5,20 @@
 }
 
 <div class="lecturer-page-wrapper">
+    @if (TempData["Error"] != null)
+    {
+            <div class="alert alert-danger mb-3" style="border-radius: 6px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; padding: 12px 16px; font-size: 14px; font-weight: 600;">
+            @TempData["Error"]
+            </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+            <div class="alert alert-success mb-3" style="border-radius: 6px; background-color: #f0fdf4; color: #166534; border: 1px solid #86efac; padding: 12px 16px; font-size: 14px; font-weight: 600;">
+            @TempData["Success"]
+            </div>
+    }
+
     <div class="lecturer-card">
         <div class="lecturer-card-header">
             <h3>DANH SÁCH GIẢNG VIÊN</h3>
@@ -64,25 +78,16 @@
 </div>
 
 <style>
-    /* Bố cục chính */
     .lecturer-page-wrapper { background: #ffffff; border-radius: 8px; padding: 24px; }
     .lecturer-card { background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #e5e7eb; }
-
-    /* Header */
     .lecturer-card-header { background-color: #162f5f; color: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
     .lecturer-card-header h3 { margin: 0; font-size: 18px; font-weight: 700; text-transform: uppercase; }
     .btn-add-lecturer { font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 6px; color: #111827; background-color: #ffffff; border: none; text-decoration: none; }
     .btn-add-lecturer:hover { background-color: #f3f4f6; }
-
-    /* Tìm kiếm */
     .lecturer-search-box { padding: 14px 16px; background-color: #ffffff; border-bottom: 1px solid #edf0f3; }
     .lecturer-search-box input { height: 42px; border-radius: 6px; border: 1px solid #cfd8e3; font-size: 15px; }
-
-    /* Bảng */
     .lecturer-table thead th { background-color: #f5f6fa; color: #687386; font-weight: 700; text-transform: uppercase; padding: 14px 16px; border-bottom: 1px solid #e5e7eb; }
     .lecturer-table tbody td { padding: 14px 16px; color: #26364a; border-bottom: 1px solid #edf0f3; }
-
-    /* Nút bấm */
     .btn-edit { background-color: #dbeafe; color: #1f3b73; border-radius: 6px; min-width: 72px; margin-right: 6px; }
     .btn-edit:hover { background-color: #c7dbfb; }
     .btn-delete { background-color: #f3f4f6; color: #374151; border-radius: 6px; min-width: 72px; }

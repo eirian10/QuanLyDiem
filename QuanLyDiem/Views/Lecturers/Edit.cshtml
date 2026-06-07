@@ -1,31 +1,32 @@
 ﻿@model QuanLyDiem.Models.User
 
 @{
-    ViewData["Title"] = "Thêm giảng viên mới";
+    ViewData["Title"] = "Chỉnh sửa giảng viên";
 }
 
 <div class="lecturer-form-page-wrapper">
     <div class="lecturer-form-card">
         <div class="lecturer-form-header">
-            <h3>THÊM GIẢNG VIÊN MỚI</h3>
+            <h3>CHỈNH SỬA THÔNG TIN GIẢNG VIÊN</h3>
         </div>
 
         <div class="lecturer-form-body">
-            <form asp-action="Create" method="post">
+            <form asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
 
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="row g-4">
                     <div class="col-md-6">
                         <label asp-for="Username" class="form-label">Tên đăng nhập (Mã GV)</label>
-                        <input asp-for="Username" class="form-control custom-input" placeholder="Ví dụ: gv_tung" />
+                        <input asp-for="Username" class="form-control custom-input" />
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6">
                         <label asp-for="FullName" class="form-label">Họ và Tên</label>
-                        <input asp-for="FullName" class="form-control custom-input" placeholder="Ví dụ: Nguyễn Thanh Tùng" />
+                        <input asp-for="FullName" class="form-control custom-input" />
                         <span asp-validation-for="FullName" class="text-danger"></span>
                     </div>
 
@@ -38,7 +39,6 @@
                     <div class="col-md-6">
                         <label asp-for="FacultyId" class="form-label">Khoa trực thuộc</label>
                         <select asp-for="FacultyId" asp-items="ViewBag.Faculties" class="form-select custom-input">
-                            <option value="">-- Chọn khoa --</option>
                         </select>
                         <span asp-validation-for="FacultyId" class="text-danger"></span>
                     </div>
@@ -48,7 +48,7 @@
 
                 <div class="form-action-group">
                     <button type="submit" class="btn btn-save-lecturer">
-                        Lưu giảng viên
+                        Cập nhật thay đổi
                     </button>
 
                     <a asp-action="Index" class="btn btn-back-lecturer">
@@ -61,6 +61,7 @@
 </div>
 
 <style>
+    /* CSS giống hệt trang Create để đảm bảo đồng bộ */
     .lecturer-form-page-wrapper { background: #ffffff; border-radius: 8px; padding: 24px; min-height: 640px; }
     .lecturer-form-card { background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #e5e7eb; }
     .lecturer-form-header { background-color: #162f5f; color: #ffffff; padding: 16px 20px; }
