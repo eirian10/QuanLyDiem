@@ -30,11 +30,17 @@
 </head>
 <body>
 	@{
-		string GetActive(string controller, string action)
+		string GetActive(string controller, string? action = null)
 		{
-			var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-			var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-			return (currentController == controller && currentAction == action) ? "custom-active" : "custom-hover";
+			var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+
+			if (currentController == "Grade" && controller == "Enrollments")
+			{
+				return "custom-active";
+			}
+
+			return (currentController == controller) ? "custom-active" : "custom-hover";
 		}
 	}
 
@@ -50,12 +56,12 @@
 				</div>
 			</a>
 			<div class="ms-auto d-flex align-items-center gap-4">
-				@if (User.Identity.IsAuthenticated)
+				@if (User.Identity?.IsAuthenticated == true)
 				{
-							<div class="d-flex align-items-center px-3 py-1 rounded-pill profile-badge" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);">
-								<i class="fas fa-user-circle text-white-50 me-2 fs-4"></i>
-								<span class="text-white fw-medium" style="font-size: 13px;">@User.Identity.Name</span>
-							</div>
+						<div class="d-flex align-items-center px-3 py-1 rounded-pill profile-badge" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);">
+							<i class="fas fa-user-circle text-white-50 me-2 fs-4"></i>
+							<span class="text-white fw-medium" style="font-size: 13px;">@User.Identity?.Name</span>
+						</div>
 				}
 			</div>
 		</div>
@@ -64,58 +70,53 @@
 	<div class="d-flex flex-column qnu-sidebar" style="width: 250px; height: calc(100vh - 70px); position: fixed; top: 70px; left: 0; z-index: 99;">
 		<div class="flex-grow-1 overflow-auto pt-3 px-3 custom-scrollbar">
 
-	<div class="sidebar-heading mt-2 mb-2 px-3">HỆ THỐNG</div>
-	<div class="list-group list-group-flush mb-3">
-		<a asp-controller="Home" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Home", "Index") d-flex align-items-center">
-			<i class="fas fa-home menu-icon me-3"></i> <span class="fw-semibold">Trang chủ</span>
-		</a>
-	</div>
+			<div class="sidebar-heading mt-2 mb-2 px-3">HỆ THỐNG</div>
+			<div class="list-group list-group-flush mb-3">
+				<a asp-controller="Home" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Home", "Index") d-flex align-items-center">
+					<i class="fas fa-home menu-icon me-3"></i> <span class="fw-semibold">Trang chủ</span>
+				</a>
+			</div>
 
 			@if (User.IsInRole("Admin"))
 			{
-				<div class="sidebar-heading mt-3 mb-2 px-3">QUẢN TRỊ HỆ THỐNG</div>
-				<div class="list-group list-group-flush mb-3">
-							<a asp-controller="Lecturers" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Lecturers", "Index") d-flex align-items-center">
-						<i class="fas fa-users-cog menu-icon me-3"></i> <span class="fw-medium">Quản lý tài khoản giảng viên</span>
-					</a>
-					<a asp-controller="Subjects" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Subjects", "Index") d-flex align-items-center">
-						<i class="fas fa-book menu-icon me-3"></i> <span class="fw-medium">Quản lý môn học</span>
-					</a>
-					<a asp-controller="CourseClassManagement" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("CourseClassManagement", "Index") d-flex align-items-center">
-						<i class="fas fa-layer-group menu-icon me-3"></i> <span class="fw-medium">Lớp học phần</span>
-					</a>
-					<a asp-controller="Students" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Students", "Index") d-flex align-items-center">
-						<i class="fas fa-user-friends menu-icon me-3"></i> <span class="fw-medium">Quản lý sinh viên</span>
-					</a>
-				</div>
+					<div class="sidebar-heading mt-3 mb-2 px-3">QUẢN TRỊ HỆ THỐNG</div>
+					<div class="list-group list-group-flush mb-3">
+						<a asp-controller="Lecturers" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Lecturers", "Index") d-flex align-items-center">
+							<i class="fas fa-users-cog menu-icon me-3"></i> <span class="fw-medium">Quản lý tài khoản giảng viên</span>
+						</a>
+						<a asp-controller="Subjects" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Subjects", "Index") d-flex align-items-center">
+							<i class="fas fa-book menu-icon me-3"></i> <span class="fw-medium">Quản lý môn học</span>
+						</a>
+						<a asp-controller="CourseClassManagement" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("CourseClassManagement", "Index") d-flex align-items-center">
+							<i class="fas fa-layer-group menu-icon me-3"></i> <span class="fw-medium">Lớp học phần</span>
+						</a>
+						<a asp-controller="Students" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Students", "Index") d-flex align-items-center">
+							<i class="fas fa-user-friends menu-icon me-3"></i> <span class="fw-medium">Quản lý sinh viên</span>
+						</a>
+					</div>
 			}
 
 			@if (User.IsInRole("Admin") || User.IsInRole("Lecturer"))
 			{
-				<div class="sidebar-heading mt-3 mb-2 px-3">ĐÀO TẠO</div>
-				<div class="list-group list-group-flush mb-3">
-					<a asp-controller="Enrollments" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Enrollments", "Index") d-flex align-items-center">
-						<i class="fas fa-user-graduate menu-icon me-3"></i> <span class="fw-medium">Nhập sinh viên</span>
-					</a>
-				</div>
+					<div class="sidebar-heading mt-3 mb-2 px-3">ĐÀO TẠO</div>
+					<div class="list-group list-group-flush mb-3">
+						<a asp-controller="Enrollments" asp-action="Index" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 @GetActive("Enrollments", "Index") d-flex align-items-center">
+							<i class="fas fa-user-graduate menu-icon me-3"></i> <span class="fw-medium">Nhập sinh viên</span>
+						</a>
+					</div>
 			}
+			</div>
 
-			@if (User.Identity.IsAuthenticated)
-			{
-			}
-</div>
-
-		@if (User.Identity.IsAuthenticated)
+		@if (User.Identity?.IsAuthenticated == true)
 		{
-						<div class="sidebar-heading mt-2 mb-2 px-3">TÀI KHOẢN</div>
-						<form asp-controller="Auth" asp-action="Logout" method="post">
-							<button type="submit" class="list-group-item border-0 py-2.5 px-3 mb-1 rounded-3 custom-logout d-flex align-items-center w-100 bg-transparent">
-								<i class="fas fa-sign-out-alt menu-icon me-3 text-danger"></i>
-								<span class="fw-medium text-danger">Đăng xuất</span>
-							</button>
-						</form>
+				<div class="sidebar-heading mt-2 mb-2 px-3">TÀI KHOẢN</div>
+				<form asp-controller="Auth" asp-action="Logout" method="post" class="px-3">
+					<button type="submit" class="list-group-item border-0 py-2.5 px-3 mb-3 rounded-3 custom-logout d-flex align-items-center w-100 bg-transparent">
+						<i class="fas fa-sign-out-alt menu-icon me-3 text-danger"></i>
+						<span class="fw-medium text-danger">Đăng xuất</span>
+					</button>
+				</form>
 		}
-		</div>
 	</div>
 
 	<div class="main-wrapper">
@@ -127,4 +128,4 @@
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
-</html> 
+</html>
