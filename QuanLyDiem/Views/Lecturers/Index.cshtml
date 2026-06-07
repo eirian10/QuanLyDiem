@@ -1,0 +1,108 @@
+﻿@model IEnumerable<QuanLyDiem.Models.User>
+
+@{
+    ViewData["Title"] = "Quản lý giảng viên";
+}
+
+<div class="lecturer-page-wrapper">
+    <div class="lecturer-card">
+        <div class="lecturer-card-header">
+            <h3>DANH SÁCH GIẢNG VIÊN</h3>
+            <a asp-action="Create" class="btn btn-light btn-add-lecturer">
+                + Thêm giảng viên mới
+            </a>
+        </div>
+
+        <div class="lecturer-search-box">
+            <input type="text"
+                   id="searchLecturer"
+                   class="form-control"
+                   placeholder="Tìm theo mã, tên, email, hoặc khoa..." />
+        </div>
+
+        <div class="table-responsive">
+            <table class="table lecturer-table mb-0" id="lecturerTable">
+                <thead>
+                    <tr>
+                        <th>Mã GV</th>
+                        <th>Họ và Tên</th>
+                        <th>Email</th>
+                        <th>Khoa trực thuộc</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                                    <tr data-search="@($"{item.Username} {item.FullName} {item.Email} {item.Faculty?.FacultyName}".ToLower())">
+                                        <td class="fw-semibold">@item.Username</td>
+                                        <td>@item.FullName</td>
+                                        <td>@item.Email</td>
+                                        <td>@(item.Faculty?.FacultyName ?? "Chưa cập nhật")</td>
+                                        <td class="text-center">
+                                            <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-edit">Sửa</a>
+                                            <form asp-action="Delete" asp-route-id="@item.UserId" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa giảng viên này?');">
+                                        @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-delete">Xóa</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                        }
+                    }
+                    else
+                    {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">Chưa có giảng viên nào</td>
+                            </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Bố cục chính */
+    .lecturer-page-wrapper { background: #ffffff; border-radius: 8px; padding: 24px; }
+    .lecturer-card { background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #e5e7eb; }
+
+    /* Header */
+    .lecturer-card-header { background-color: #162f5f; color: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .lecturer-card-header h3 { margin: 0; font-size: 18px; font-weight: 700; text-transform: uppercase; }
+    .btn-add-lecturer { font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 6px; color: #111827; background-color: #ffffff; border: none; text-decoration: none; }
+    .btn-add-lecturer:hover { background-color: #f3f4f6; }
+
+    /* Tìm kiếm */
+    .lecturer-search-box { padding: 14px 16px; background-color: #ffffff; border-bottom: 1px solid #edf0f3; }
+    .lecturer-search-box input { height: 42px; border-radius: 6px; border: 1px solid #cfd8e3; font-size: 15px; }
+
+    /* Bảng */
+    .lecturer-table thead th { background-color: #f5f6fa; color: #687386; font-weight: 700; text-transform: uppercase; padding: 14px 16px; border-bottom: 1px solid #e5e7eb; }
+    .lecturer-table tbody td { padding: 14px 16px; color: #26364a; border-bottom: 1px solid #edf0f3; }
+
+    /* Nút bấm */
+    .btn-edit { background-color: #dbeafe; color: #1f3b73; border-radius: 6px; min-width: 72px; margin-right: 6px; }
+    .btn-edit:hover { background-color: #c7dbfb; }
+    .btn-delete { background-color: #f3f4f6; color: #374151; border-radius: 6px; min-width: 72px; }
+    .btn-delete:hover { background-color: #e5e7eb; }
+</style>
+
+@section Scripts {
+        <script>
+            $(document).ready(function () {
+                $("#searchLecturer").on("keyup", function () {
+                    var keyword = $(this).val().toLowerCase().trim();
+                    $("#lecturerTable tbody tr").each(function () {
+                        var rowText = $(this).data("search");
+                        if (rowText && rowText.indexOf(keyword) > -1) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                });
+            });
+        </script>
+}
