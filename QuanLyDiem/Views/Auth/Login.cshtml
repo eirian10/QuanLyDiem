@@ -167,6 +167,23 @@
 
                     <button type="submit" class="btn btn-login mb-4">ĐĂNG NHẬP</button>
                 </form>
+                @* Dang nhap bang google *@
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger text-center mb-3" style="font-size: 13px; border-radius: 10px;">
+                        <i class="fas fa-exclamation-circle me-1"></i> @TempData["Error"]
+                    </div>
+                }
+
+                <div class="text-center mb-3">
+                    <span style="color: #a0aec0; font-size: 13px;">hoặc</span>
+                </div>
+
+                <a href="/Auth/LoginWithGoogle" class="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                   style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; color: #3b4d75; background: #fff; transition: all 0.3s;">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" height="20" />
+                    Đăng nhập bằng Google
+                </a>
             </div>
         </div>
     </div>
