@@ -197,5 +197,55 @@ namespace QuanLyDiem.Controllers
             ViewBag.Error = "Tài khoản không tồn tại.";
             return View();
         }
+
+        // Bắt đầu luồng Google
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult LoginWithGoogle()
+        {
+            var redirectUrl = Url.Action("GoogleCallback", "Auth");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, "Google");
+        }
+
+        // Google callback về đây
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GoogleCallback()
+        {
+            var result = await HttpContext.AuthenticateAsync("Google");
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = "Đăng nhập Google thất bại.";
+                return RedirectToAction("Login");
+            }
+
+            var email = result.Principal?.FindFirstValue(ClaimTypes.Email);
+            if (email == null)
+            {
+                TempData["Error"] = "Không lấy được email từ Google.";
+                return RedirectToAction("Login");
+            }
+
+            // Chỉ tìm, không tạo mới
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                TempData["Error"] = "Email này không có trong hệ thống. Vui lòng liên hệ Admin.";
+                return RedirectToAction("Login");
+            }
+
+            // Tạo cookie giống login thường
+            var claims = new List<Claim>
+    {
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("UserId", user.UserId.ToString())
+    };
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

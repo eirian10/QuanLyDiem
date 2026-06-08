@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 *.db
 *.sqbpro
+/QuanLyDiem/appsettings.Development.json
+/QuanLyDiem/appsettings.Development.json
+/QuanLyDiem/appsettings.Development.json
