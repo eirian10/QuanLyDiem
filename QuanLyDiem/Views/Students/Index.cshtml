@@ -137,7 +137,7 @@
                 <div class="col-md-5 col-sm-12 mb-2">
                     <label class="form-label font-weight-bold text-secondary">Từ khóa tìm kiếm:</label>
                     <div class="input-group">
-                        <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control edu-input" placeholder="Nhập mã số, họ lót hoặc tên..." />
+                        <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control edu-input" placeholder="Nhập mã sinh viên hoặc tên..." />
                     </div>
                 </div>
 
@@ -180,7 +180,7 @@
                             </td>
                             <td class="text-center">@item.DateOfBirth.ToString("dd/MM/yyyy")</td>
                             <td class="text-center font-weight-bold edu-text-primary">
-                                @(item.HomeroomClass != null ? item.HomeroomClass.ClassName : "N/A")
+                               @item.HomeroomClass.ClassName
                             </td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm">

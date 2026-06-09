@@ -98,11 +98,9 @@
                             <label asp-for="StudentCode" class="form-label">Mã số sinh viên (MSSV)</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
-                                <input asp-for="StudentCode" class="form-control bg-light" readonly />
+                                <input asp-for="StudentCode" class="form-control bg-light"  />
                             </div>
-                            <small class="text-muted d-block mt-1" style="font-size: 12px;">
-                                <i class="fas fa-info-circle me-1 text-secondary"></i>Mã định danh duy nhất không thể thay đổi
-                            </small>
+                            <span asp-validation-for="StudentCode" class="text-danger small mt-1 d-block"></span>
                         </div>
 
                         <div class="row mb-3">
@@ -132,7 +130,6 @@
                                     <select asp-for="Gender" class="form-select">
                                         <option value="Nam">Nam</option>
                                         <option value="Nữ">Nữ</option>
-                                        <option value="Khác">Khác</option>
                                     </select>
                                 </div>
                                 <span asp-validation-for="Gender" class="text-danger small mt-1 d-block"></span>

@@ -7,9 +7,11 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuanLyDiem.Controllers
 {
+    [Authorize(Roles = "Lecturer")] 
     public class GradeController : Controller
     {
         private readonly IGradeService _gradeService;

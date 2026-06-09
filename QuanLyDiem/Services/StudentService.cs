@@ -40,14 +40,14 @@ namespace QuanLyDiem.Services
                                       || (s.LastName.ToLower() + " " + s.FirstName.ToLower()).Contains(keyword));
             }
 
-            // 1. Đếm tổng số sinh viên thỏa mãn bộ lọc
+            //  Đếm tổng số sinh viên thỏa mãn bộ lọc
             int totalRecords = await query.CountAsync();
 
-            // 2. Phân trang dữ liệu dưới Database
+            //Lay ra danh sach sinh vien ap dung phan trang 
             var data = await query
                 .OrderBy(s => s.StudentCode)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((pageNumber - 1) * pageSize) //So dong can bo qua
+                .Take(pageSize) //Lay so dong can hieu thi sau khi da bo qua 
                 .ToListAsync();
 
             return (data, totalRecords);
