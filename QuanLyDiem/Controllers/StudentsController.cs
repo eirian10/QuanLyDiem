@@ -18,19 +18,25 @@ namespace QuanLyDiem.Controllers
         }
 
         // Thay đổi tham số homeroomClass sang kiểu int? homeroomClassId để đồng bộ bộ lọc
-        public async Task<IActionResult> Index(int? homeroomClassId, string? searchString)
+        public async Task<IActionResult> Index(int? homeroomClassId, string? searchString, int pageNumber = 1)
         {
-            var classes = await _studentService.GetUniqueClassesAsync();
+            int pageSize = 10; // Đặt cố định hiển thị 10 sinh viên mỗi trang
 
-            // Khởi tạo SelectList: "HomeroomClassId" là Value xử lý, "ClassName" là Text hiển thị
+            var classes = await _studentService.GetUniqueClassesAsync();
             ViewBag.Classes = new SelectList(classes, "HomeroomClassId", "ClassName", homeroomClassId);
             ViewBag.SelectedClass = homeroomClassId;
             ViewBag.SearchString = searchString;
 
-            var students = await _studentService.GetAllStudentsAsync(homeroomClassId, searchString);
-            return View(students);
-        }
+            // Gọi hàm phân trang mới từ Service
+            var result = await _studentService.GetAllStudentsAsync(homeroomClassId, searchString, pageNumber, pageSize);
 
+            // Tính toán và lưu dữ liệu phân trang vào ViewBag để View sử dụng đúng định dạng mong muốn
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalRecords = result.TotalRecords;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)result.TotalRecords / pageSize);
+
+            return View(result.Data);
+        }
         public async Task<IActionResult> Create()
         {
             var classes = await _studentService.GetUniqueClassesAsync();

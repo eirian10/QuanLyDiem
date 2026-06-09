@@ -17,18 +17,19 @@ namespace QuanLyDiem.Services
         }
 
         // Lấy danh sách sinh viên: Lọc theo Id của lớp và từ khóa tìm kiếm
-        public async Task<IEnumerable<Student>> GetAllStudentsAsync(int? homeroomClassId, string? searchString)
+        // =========================================================================
+        // CẬP NHẬT: Thêm tham số phân trang và trả về Tuple (Dữ liệu, Tổng số bản ghi)
+        // =========================================================================
+        public async Task<(IEnumerable<Student> Data, int TotalRecords)> GetAllStudentsAsync(
+            int? homeroomClassId, string? searchString, int pageNumber, int pageSize)
         {
-            // Dùng .Include để nạp kèm thông tin lớp, giúp View hiển thị được ClassName
             var query = _context.Students.Include(s => s.HomeroomClass).AsQueryable();
 
-            // Lọc theo Id lớp sinh hoạt (int)
             if (homeroomClassId > 0)
             {
                 query = query.Where(s => s.HomeroomClassId == homeroomClassId);
             }
 
-            // Lọc theo Từ khóa (Tìm kiếm trên Mã SV, Họ lót, hoặc Tên)
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 var keyword = searchString.ToLower().Trim();
@@ -39,7 +40,17 @@ namespace QuanLyDiem.Services
                                       || (s.LastName.ToLower() + " " + s.FirstName.ToLower()).Contains(keyword));
             }
 
-            return await query.ToListAsync();
+            //  Đếm tổng số sinh viên thỏa mãn bộ lọc
+            int totalRecords = await query.CountAsync();
+
+            //Lay ra danh sach sinh vien ap dung phan trang 
+            var data = await query
+                .OrderBy(s => s.StudentCode)
+                .Skip((pageNumber - 1) * pageSize) //So dong can bo qua
+                .Take(pageSize) //Lay so dong can hieu thi sau khi da bo qua 
+                .ToListAsync();
+
+            return (data, totalRecords);
         }
 
         // Lấy danh sách tất cả các lớp sinh hoạt để nạp vào Dropdown tương tác trên View
