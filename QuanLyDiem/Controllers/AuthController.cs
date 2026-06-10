@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using QuanLyDiem.Data;
-using QuanLyDiem.ViewModels; 
+using QuanLyDiem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using QuanLyDiem.Models;
@@ -15,7 +15,7 @@ namespace QuanLyDiem.Controllers
     public class AuthController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IEmailService _emailService; // Dịch vụ gửi mail đã được tiêm qua DI
+        private readonly IEmailService _emailService;
 
         public AuthController(ApplicationDbContext context, IEmailService emailService)
         {
@@ -23,7 +23,6 @@ namespace QuanLyDiem.Controllers
             _emailService = emailService;
         }
 
-        // --- CÁC HÀM LOGIN / LOGOUT GIỮ NGUYÊN ---
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login() => View();
@@ -38,27 +37,15 @@ namespace QuanLyDiem.Controllers
 
             if (user != null)
             {
-                bool isPasswordValid = false;
-                // Kiểm tra mật khẩu
-                if (user.Password.StartsWith("$2a$"))
-                    isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
-                else
-                    isPasswordValid = new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, model.Password) == PasswordVerificationResult.Success;
+                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
 
                 if (isPasswordValid)
                 {
-                    // Tự động nâng cấp mật khẩu cũ sang BCrypt
-                    if (!user.Password.StartsWith("$2a$"))
-                    {
-                        user.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
-                        await _context.SaveChangesAsync();
-                    }
-
                     var claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim("UserId", user.UserId.ToString())
-            };
+                        new Claim(ClaimTypes.Name, user.FullName),
+                        new Claim(ClaimTypes.Role, user.Role),
+                        new Claim("UserId", user.UserId.ToString())
+                    };
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
@@ -70,6 +57,7 @@ namespace QuanLyDiem.Controllers
             ModelState.AddModelError(string.Empty, "Thông tin đăng nhập không chính xác.");
             return View(model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken] // Bảo vệ chống tấn công CSRF
         public async Task<IActionResult> Logout()
@@ -77,18 +65,20 @@ namespace QuanLyDiem.Controllers
             // Xóa Cookie xác thực của người dùng
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // Xóa luôn Session (nếu bạn có dùng Session cho các tính năng khác)
+            // Xóa luôn Session 
             HttpContext.Session.Clear();
 
             // Chuyển hướng về trang Đăng nhập
             return RedirectToAction("Login", "Auth");
         }
+
         // --- TÍNH NĂNG QUÊN MẬT KHẨU (MVC) ---
 
         // Hiển thị form nhập Email
         [AllowAnonymous]
         [HttpGet]
         public IActionResult ForgotPassword() => View();
+
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -124,10 +114,12 @@ namespace QuanLyDiem.Controllers
 
             return RedirectToAction("VerifyOtp");
         }
+
         [AllowAnonymous]
         // Hiển thị form nhập OTP
         [HttpGet]
         public IActionResult VerifyOtp() => View();
+
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -237,11 +229,11 @@ namespace QuanLyDiem.Controllers
 
             // Tạo cookie giống login thường
             var claims = new List<Claim>
-    {
+            {
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim("UserId", user.UserId.ToString())
-    };
+            };
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
