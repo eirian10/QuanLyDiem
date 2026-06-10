@@ -38,28 +38,32 @@ namespace QuanLyDiem.Controllers
             {
                 bool isPasswordValid = false;
 
-                if (user.Password.StartsWith("$2a$"))
+                if (user.Password.StartsWith("$2"))
                 {
                     isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
                 }
-                else
+                else if (user.Password.StartsWith("AQAA"))
                 {
                     isPasswordValid = new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, model.Password) == PasswordVerificationResult.Success;
+                }
+                else
+                {
+                    isPasswordValid = (user.Password == model.Password);
                 }
 
                 if (isPasswordValid)
                 {
-                    if (!user.Password.StartsWith("$2a$"))
+                    if (!user.Password.StartsWith("$2"))
                     {
                         user.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
                         await _context.SaveChangesAsync();
                     }
 
                     var claims = new List<Claim> {
-                        new Claim(ClaimTypes.Name, user.FullName),
-                        new Claim(ClaimTypes.Role, user.Role),
-                        new Claim("UserId", user.UserId.ToString())
-                    };
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("UserId", user.UserId.ToString())
+            };
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
