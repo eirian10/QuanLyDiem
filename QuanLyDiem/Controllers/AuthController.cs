@@ -227,14 +227,16 @@ namespace QuanLyDiem.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Tạo cookie giống login thường
+            // Lay ds thong tin user từ Google, tạo claims(key,value) 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim("UserId", user.UserId.ToString())
-            };
+    };
+            //gom cac claims thanh 1 danh tinh xac thuc dang nhap, dua vao scheme cookie
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //lưu Claims vào cookie trên trình duyệt
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
             return RedirectToAction("Index", "Home");

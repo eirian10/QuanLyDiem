@@ -16,27 +16,27 @@ namespace QuanLyDiem.Controllers
             _enrollmentService = enrollmentService;
         }
 
-        public async Task<IActionResult> Index(int? semesterId)
+        public async Task<IActionResult> Index(int? semesterId, string? search)
         {
             ViewBag.SelectedSemesterId = semesterId;
+            ViewBag.Search = search;
 
-            // GỌI QUA SERVICE: Lấy danh sách học kỳ đẩy vào ViewBag để làm bộ lọc động
+            //  Lấy danh sách học kỳ đẩy vào ViewBag để làm bộ lọc động
             ViewBag.Semesters = await _enrollmentService.GetAllSemestersAsync();
 
-            // Khối xử lý phân quyền lấy danh sách lớp học phần giữ nguyên
             if (User.IsInRole("Admin"))
             {
-                var allDbClasses = await _enrollmentService.GetAllClassesAsync(semesterId);
+                var allDbClasses = await _enrollmentService.GetAllClassesAsync(semesterId,search);
                 return View(allDbClasses);
             }
-
+            //Tim trong Claims xem có claim nào tên là "UserId" 
             var userIdClaim = User.FindFirst("UserId")?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int lecturerId))
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int lecturerId)) //Chuyen sang int xong gan cho leacturer id
             {
                 return Challenge();
             }
 
-            var lecturerClasses = await _enrollmentService.GetLecturerClassesAsync(lecturerId, semesterId);
+            var lecturerClasses = await _enrollmentService.GetLecturerClassesAsync(lecturerId, semesterId, search);
             return View(lecturerClasses);
         }
 

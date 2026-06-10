@@ -16,18 +16,16 @@ namespace QuanLyDiem.Controllers
         {
             _studentService = studentService;
         }
-
-        // Thay đổi tham số homeroomClass sang kiểu int? homeroomClassId để đồng bộ bộ lọc
         public async Task<IActionResult> Index(int? homeroomClassId, string? searchString, int pageNumber = 1)
         {
-            int pageSize = 10; // Đặt cố định hiển thị 10 sinh viên mỗi trang
+            int pageSize = 10; // Đặt cố định hiển thị so sinh viên mỗi trang
 
             var classes = await _studentService.GetUniqueClassesAsync();
             ViewBag.Classes = new SelectList(classes, "HomeroomClassId", "ClassName", homeroomClassId);
-            ViewBag.SelectedClass = homeroomClassId;
+            ViewBag.SelectedClass = homeroomClassId; //Giup ko bi mat chu khi loc
             ViewBag.SearchString = searchString;
 
-            // Gọi hàm phân trang mới từ Service
+            // Lấy ra danh sách sinh viên 
             var result = await _studentService.GetAllStudentsAsync(homeroomClassId, searchString, pageNumber, pageSize);
 
             // Tính toán và lưu dữ liệu phân trang vào ViewBag để View sử dụng đúng định dạng mong muốn
@@ -56,7 +54,7 @@ namespace QuanLyDiem.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("StudentCode", "Mã sinh viên đã tồn tại.");
+                    ModelState.AddModelError("StudentCode", "Mã sinh viên đã tồn tại ");
                 }
             }
 
@@ -65,15 +63,7 @@ namespace QuanLyDiem.Controllers
             return View(student);
         }
 
-        public async Task<IActionResult> Details(int id)
-        {
-            var student = await _studentService.GetStudentByIdAsync(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-            return View(student);
-        }
+
 
         // BỔ SUNG: Hàm lấy dữ liệu cũ đưa lên form Edit công khai
         public async Task<IActionResult> Edit(int id)
@@ -111,8 +101,6 @@ namespace QuanLyDiem.Controllers
             ViewBag.HomeroomClassId = new SelectList(classes, "HomeroomClassId", "ClassName", std.HomeroomClassId);
             return View(std);
         }
-
-        // SỬA LỖI CHÍNH TẢ: Thay đổi Detete thành Delete chuẩn chỉnh
         public async Task<IActionResult> Delete(int id)
         {
             var student = await _studentService.GetStudentByIdAsync(id);
