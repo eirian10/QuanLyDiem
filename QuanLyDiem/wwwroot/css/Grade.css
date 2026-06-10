@@ -3,46 +3,106 @@
    ========================================================================== */
 
 /* 1. Cấu trúc bảng và thanh tiêu đề (Áp dụng cho cả 2 trang) */
-.excel-table th {
-    text-align: center;
-    background-color: #f8f9fa;
-    vertical-align: middle !important;
-    font-weight: 600;
-    color: #495057;
+.excel-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    border: none !important;
 }
 
-/* 2. Cấu hình dòng dữ liệu khi di chuột qua */
-.excel-table tbody tr:hover {
-    background-color: #f1f3f5;
-}
-
-/* 3. ĐỊNH DẠNG RIÊNG CHO TRANG NHẬP ĐIỂM (EnterScores.cshtml) */
-/* Xóa padding của ô td để ô input có thể kéo giãn chiếm trọn 100% diện tích ô */
-.excel-table.editable td {
-    padding: 0 !important;
-    vertical-align: middle;
-}
-
-/* Biến ô input thành một ô lưới Excel thuần túy */
-.excel-table.editable input {
-    border: none;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    outline: none;
-    padding: 8px 5px; /* Độ cao vừa vặn cho việc gõ điểm */
-    text-align: center;
-}
-
-    /* Hiệu ứng đổi màu nền và bo viền xanh hi-tech khi giáo viên nhấn chọn ô để nhập */
-    .excel-table.editable input:focus {
-        background-color: #e8f0fe;
-        box-shadow: inset 0 0 0 2px #1a73e8;
+    .excel-table th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        background-color: #f8fafc !important; /* Màu nền xám xanh mịn màng */
+        color: #475569 !important; /* Màu chữ tiêu đề phẳng */
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        padding: 12px !important;
+        border: 1px solid #e2e8f0 !important; /* Viền ô lưới mỏng nhẹ */
     }
 
-/* 4. ĐỊNH DẠNG RIÊNG CHO TRANG XEM BÁO CÁO GPA (ViewGpaReport.cshtml) */
-/* Vì trang này chỉ hiển thị chữ thuần (Read-only), cần có khoảng đệm để chữ không dính sát viền */
-.excel-table.read-only td {
-    vertical-align: middle !important;
-    padding: 10px 8px !important;
+    .excel-table td {
+        font-size: 14px !important;
+        color: #334155 !important;
+        border: 1px solid #e2e8f0 !important;
+        vertical-align: middle !important;
+    }
+
+    /* 2. Cấu hình dòng dữ liệu khi di chuột qua */
+    .excel-table tbody tr:hover {
+        background-color: #f1f5f9 !important; /* Màu nền highlight nhẹ khi hover dòng */
+    }
+
+
+    /* 3. ĐỊNH DẠNG RIÊNG CHO TRANG NHẬP ĐIỂM (EnterScores.cshtml) */
+    /* Xóa padding của ô td để ô input có thể kéo giãn chiếm trọn 100% diện tích ô */
+    .excel-table.editable td.input-score-cell {
+        padding: 0 !important;
+    }
+
+    /* Biến ô input thành một ô lưới Excel thuần túy */
+    .excel-table.editable .input-score-cell input {
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        width: 100% !important;
+        height: 100% !important;
+        padding: 12px 5px !important; /* Độ cao vừa vặn đồng bộ dòng dữ liệu */
+        text-align: center !important;
+        color: #334155 !important;
+        font-weight: 500 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important; /* Khử bo góc Bootstrap để vuông vắn chuẩn Excel */
+    }
+
+        /* Hiệu ứng đổi màu nền và bo viền xanh hi-tech khi giáo viên nhấn chọn ô để nhập */
+        .excel-table.editable .input-score-cell input:focus {
+            background-color: rgba(22, 42, 82, 0.04) !important; /* Nền xanh Navy trong suốt nhẹ */
+            box-shadow: inset 0 0 0 2px #162a52 !important; /* Viền hộp trong màu Navy đậm đồng bộ hệ thống */
+        }
+
+
+    /* 4. ĐỊNH DẠNG RIÊNG CHO TRANG XEM BÁO CÁO GPA (ViewGpaReport.cshtml) */
+    /* Vì trang này chỉ hiển thị chữ thuần (Read-only), cần có khoảng đệm để chữ không dính sát viền */
+    .excel-table.read-only td {
+        padding: 12px 10px !important; /* Khoảng đệm lý tưởng tương đương độ cao dòng của trang nhập điểm */
+    }
+
+
+/* ==========================================================================
+   BỔ SUNG: CÁC THÀNH PHẦN GIAO DIỆN PHỤ ĐI KÈM (BREADCRUMB & INFO CARD)
+   ========================================================================== */
+.custom-breadcrumb .breadcrumb-item a {
+    color: #162a52 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
 }
+
+    .custom-breadcrumb .breadcrumb-item a i {
+        color: #162a52 !important;
+    }
+
+    .custom-breadcrumb .breadcrumb-item a:hover {
+        text-decoration: underline !important;
+    }
+
+.custom-breadcrumb .breadcrumb-item.active {
+    color: #ff9800 !important;
+    font-weight: 600 !important;
+}
+
+.info-card {
+    background-color: #ffffff !important;
+    border: none !important;
+    border-left: 5px solid #162a52 !important;
+    border-radius: 8px !important;
+}
+
+    .info-card h4 {
+        color: #162a52 !important;
+        font-weight: 700 !important;
+        margin: 0;
+    }
+
+        .info-card h4 span {
+            color: #ff9800 !important;
+        }

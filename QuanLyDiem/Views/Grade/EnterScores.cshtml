@@ -1,40 +1,71 @@
 ﻿@using QuanLyDiem.ViewModels
 @model GradebookViewModel
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h4 class="text-primary font-weight-bold">BẢNG NHẬP ĐIỂM CHI TIẾT</h4>
-            <p class="text-muted mb-0">Lớp: <strong>@Model.ClassCode</strong> | Môn học: <strong>@Model.SubjectName</strong></p>
-        </div>
+@{
+    ViewData["Title"] = "Nhập điểm lớp học phần";
+}
 
-        <div>
-            <a asp-controller="Grade" asp-action="ViewGpaReport" asp-route-id="@Model.CourseClassId" class="btn btn-outline-primary shadow-sm mr-2">
-                <i class="fas fa-chart-pie"></i> Xem báo cáo GPA
-            </a>
+@section Styles {
+    <link rel="stylesheet" href="~/css/Grade.css" asp-append-version="true" />
+}
 
-            <button type="submit" form="gradeForm" class="btn btn-success shadow-sm">
-                <i class="fas fa-save"></i> Lưu bảng điểm
-            </button>
+<div class="container-fluid px-1 mt-3">
 
-            <a asp-controller="Grade" asp-action="ExportEnterScoresExcel" asp-route-id="@ViewBag.CourseClassId" class="btn btn-outline-success shadow-sm font-weight-bold mx-1">
-                <i class="fas fa-file-excel mr-1"></i> Xuất Excel Nhập Điểm
-            </a>
-        </div>
+    @* --- THANH ĐIỀU HƯỚNG QUAY LẠI CHUẨN ---
+       Giúp giảng viên dễ dàng click quay ngược về trang danh sách lớp học phần gốc,
+       đồng thời hiển thị mã lớp hiện tại trên thanh điều hướng để nhận biết vị trí trang.
+    *@
+    <nav aria-label="breadcrumb" class="custom-breadcrumb mb-3">
+        <ol class="breadcrumb" style="background: transparent; padding: 0;">
+            <li class="breadcrumb-item">
+                <a asp-controller="Enrollments" asp-action="Index">
+                    <i class="fas fa-arrow-left me-1"></i>Danh sách lớp
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.ClassCode</li>
+        </ol>
+    </nav>
+
+    @* --- KHUNG THÔNG TIN CHUNG CỦA LỚP HỌC PHẦN ---
+       Hiển thị trực quan Mã lớp học phần và Tên môn học hiện tại đang thực hiện thao tác dữ liệu,
+       được đồng bộ màu sắc thương hiệu (Navy - Cam) giúp giao diện rõ ràng, chuyên nghiệp.
+    *@
+    <div class="card info-card p-4 mb-4 shadow-sm">
+        <h4 class="mb-2">Lớp Học Phần: <span>@Model.ClassCode</span></h4>
+        <p class="mb-0 text-secondary">
+            <i class="fas fa-book me-1.5" style="color: #ff9800;"></i>Môn học: <strong style="color: #1c2536;">@Model.SubjectName</strong>
+        </p>
+    </div>
+
+    <div class="d-flex justify-content-end align-items-center mb-3" style="gap: 8px;">
+        @* Nút điều hướng sang trang báo cáo thống kê GPA, tỷ lệ điểm chữ và danh sách sinh viên học lại *@
+        <a asp-controller="Grade" asp-action="ViewGpaReport" asp-route-id="@Model.CourseClassId" class="btn text-white shadow-sm" style="background-color: #162a52; font-size: 13px; font-weight: 500; border-radius: 6px; padding: 6px 14px;">
+            <i class="fas fa-chart-pie me-1"></i> Xem báo cáo GPA
+        </a>
+
+        @* Nút thực hiện gửi dữ liệu (Submit) toàn bộ form chứa danh sách điểm của lớp về Server để xử lý lưu vào cơ sở dữ liệu *@
+        <button type="submit" form="gradeForm" class="btn text-white shadow-sm" style="background-color: #28a745; font-size: 13px; font-weight: 500; border-radius: 6px; padding: 6px 14px; border: none;">
+            <i class="fas fa-save me-1"></i> Lưu bảng điểm
+        </button>
+
+        @* Nút kích hoạt lệnh xuất tệp tin Excel chứa danh sách kết quả nhập điểm hiện tại phục vụ lưu trữ nội bộ hoặc in ấn *@
+        <a asp-controller="Grade" asp-action="ExportEnterScoresExcel" asp-route-id="@Model.CourseClassId" class="btn text-white shadow-sm" style="background-color: #ff9800; font-size: 13px; font-weight: 500; border-radius: 6px; padding: 6px 14px;">
+            <i class="fas fa-file-excel mr-1"></i> Xuất Excel Nhập Điểm
+        </a>
     </div>
 
     @* Hiển thị thông báo khi thực hiện lưu dữ liệu điểm thành công từ Server gửi về *@
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            @TempData["SuccessMessage"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2 fs-5"></i>
+            <span>@TempData["SuccessMessage"]</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @* Hiển thị danh sách tóm tắt toàn bộ các lỗi kiểm tra dữ liệu (Validation) nếu có *@
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <form id="gradeForm" asp-controller="Grade" asp-action="SaveScores" method="post">
         @Html.AntiForgeryToken()
@@ -43,15 +74,15 @@
         <input type="hidden" asp-for="ClassCode" />
         <input type="hidden" asp-for="SubjectName" />
 
-        <div class="table-responsive shadow-sm">
-            <table class="table table-bordered excel-table editable m-0">
+        <div class="table-responsive shadow-sm" style="border-radius: 10px; overflow: hidden;">
+            <table class="table table-bordered excel-table editable align-middle m-0">
                 <thead>
                     <tr>
-                        <th width="50">STT</th>
-                        <th width="150">Mã Sinh Viên</th>
+                        <th style="width: 70px;">STT</th>
+                        <th style="width: 160px;">Mã Sinh Viên</th>
                         <th>Họ và Tên</th>
-                        <th width="180">Điểm Quá Trình</th>
-                        <th width="180">Điểm Cuối Kỳ</th>
+                        <th style="width: 200px;">Điểm Quá Trình</th>
+                        <th style="width: 200px;">Điểm Cuối Kỳ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,24 +90,24 @@
                     @for (int i = 0; i < Model.Students.Count; i++)
                     {
                         <tr>
-                            <td class="text-center">@(i + 1)</td>
+                            <td class="text-center text-secondary font-monospace" style="background-color: #f8fafc;">@(i + 1)</td>
 
-                            <td class="text-center bg-light">
+                            <td class="text-center">
                                 <input type="hidden" asp-for="Students[i].EnrollmentId" />
                                 <input type="hidden" asp-for="Students[i].StudentCode" />
                                 <input type="hidden" asp-for="Students[i].FullName" />
-                                @Model.Students[i].StudentCode
+                                <strong style="color: #162a52;">@Model.Students[i].StudentCode</strong>
                             </td>
 
-                            <td class="ps-3 bg-light">@Model.Students[i].FullName</td>
+                            <td class="ps-3 fw-medium">@Model.Students[i].FullName</td>
 
-                            <td>
+                            <td class="input-score-cell">
                                 <input asp-for="Students[i].ProcessScore"
                                        type="number" step="0.1" min="0" max="10"
                                        placeholder="-.-" />
                             </td>
 
-                            <td>
+                            <td class="input-score-cell">
                                 <input asp-for="Students[i].FinalScore"
                                        type="number" step="0.1" min="0" max="10"
                                        placeholder="-.-" />
