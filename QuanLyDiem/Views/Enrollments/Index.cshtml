@@ -4,7 +4,6 @@
 }
 
 <style>
-    /* Tổng thể khối tiêu đề */
     .page-title {
         color: #162a52;
         font-weight: 700;
@@ -13,14 +12,13 @@
         padding-bottom: 8px;
     }
 
-    /* Khối cấu trúc bộ lọc học kỳ */
     .filter-card {
         background-color: #ffffff;
         border-radius: 10px;
         border: 1px solid #e2e8f0;
     }
 
-    .form-select-custom {
+    .form-select-custom, .edu-input {
         border-radius: 6px;
         border: 1px solid #cbd5e1;
         color: #334155;
@@ -30,13 +28,12 @@
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-        .form-select-custom:focus {
+        .form-select-custom:focus, .edu-input:focus {
             border-color: #162a52;
             box-shadow: 0 0 0 3px rgba(22, 42, 82, 0.1);
             outline: none;
         }
 
-    /* Tinh chỉnh bảng dữ liệu theo tone màu EduGrade */
     .custom-table {
         background-color: #ffffff;
         border-radius: 12px;
@@ -61,12 +58,8 @@
             padding: 14px;
             color: #334155;
             border-bottom: 1px solid #e2e8f0 !important;
-            border-top: none !important;
-            border-left: none !important;
-            border-right: none !important;
         }
 
-        /* Hiệu ứng mượt mà khi di chuột qua các dòng */
         .custom-table tbody tr {
             transition: background-color 0.2s ease;
         }
@@ -75,7 +68,6 @@
                 background-color: rgba(22, 42, 82, 0.03);
             }
 
-    /* Thiết kế nút bấm custom */
     .btn-custom-b {
         background-color: #162a52;
         color: #ffffff;
@@ -124,36 +116,44 @@
 
     <div class="card filter-card shadow-sm mb-4">
         <div class="card-body py-3 px-4">
-            <form method="get" action="@Url.Action("Index", "Enrollments")" class="row align-items-center">
-                <div class="col-auto">
-                    <label class="form-label font-weight-bold m-0 text-secondary" style="font-size: 14px;">
-                        <i class="fas fa-filter me-1.5 text-warning"></i>
+            <form method="get" asp-for="Index" class="row align-items-end g-3">
+
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label font-weight-bold text-secondary mb-1" style="font-size: 14px;">
+                        <i class="fas fa-filter me-1 text-warning"></i> Chọn học kỳ:
                     </label>
-                </div>
-                <div class="col-sm-4 col-md-3">
                     <select name="semesterId" class="form-select form-select-custom w-100" onchange="this.form.submit()">
                         <option value="">-- Hiển thị tất cả --</option>
-
                         @if (ViewBag.Semesters != null)
                         {
                             foreach (var sem in ViewBag.Semesters as List<QuanLyDiem.Models.Semester>)
                             {
                                 <option value="@sem.SemesterId"
-                                        selected="@(ViewBag.SelectedSemesterId == sem.SemesterId ? "selected" : null)">
+                                        selected="@(ViewBag.SelectedSemesterId == sem.SemesterId ? "selected" : null)"> 
                                     Học kỳ @sem.Term — Năm học @sem.AcademicYear
                                 </option>
                             }
                         }
                     </select>
                 </div>
-                @if (ViewBag.SelectedSemesterId != null)
-                {
-                    <div class="col-auto ps-0">
-                        <a href="@Url.Action("Index", "Enrollments")" class="btn btn-sm btn-link text-decoration-none text-danger" style="font-size: 13px;">
-                            <i class="fas fa-times me-1"></i>Xóa bộ lọc
+
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label font-weight-bold text-secondary mb-1" style="font-size: 14px;">Từ khóa tìm kiếm:</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control edu-input w-100" placeholder="Nhập mã lhp / tên môn học..." />
+                </div>
+
+                <div class="col-md-5 col-sm-12 d-flex align-items-center gap-2">
+                    <button type="submit" class="btn text-white px-4 btn-custom-b" style="height: 38px;">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+
+                    @if (ViewBag.SelectedSemesterId != null || !string.IsNullOrEmpty(ViewBag.Search))
+                    {
+                        <a href="@Url.Action("Index", "Enrollments")" class="btn btn-outline-secondary rounded-3 px-3 d-inline-flex align-items-center" style="height: 38px; font-size: 13px;">
+                            <i class="fas fa-times me-1"></i> Xóa bộ lọc
                         </a>
-                    </div>
-                }
+                    }
+                </div>
             </form>
         </div>
     </div>
@@ -165,7 +165,7 @@
                 <th>Tên Môn Học</th>
                 <th class="text-center">Số Tín Chỉ</th>
                 <th>Học Kỳ / Năm Học</th>
-                <th class="text-center" style="width: 280px;">Hành động</th>
+                <th class="text-center" style="width: 280px;">Xem chi tiết lớp hp</th>
             </tr>
         </thead>
         <tbody>
@@ -176,16 +176,23 @@
                     <tr>
                         <td><strong style="color: #162a52;">@item.ClassCode</strong></td>
                         <td class="fw-medium">@item.Subject?.SubjectName</td>
-                        <td class="text-center"><span class="badge bg-light text-dark border px-2.5 py-1.5" style="font-size: 12px;">@item.Subject?.Credits TC</span></td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border px-2.5 py-1.5" style="font-size: 12px;">
+                                @item.Subject?.Credits TC
+                            </span>
+                        </td>
                         <td>Học kỳ @item.Semester?.Term — Năm học @item.Semester?.AcademicYear</td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center action-gap">
                                 <a asp-controller="Enrollments" asp-action="Details" asp-route-id="@item.CourseClassId" class="btn btn-custom-b">
                                     <i class="fas fa-users me-1.5"></i>Sinh viên
                                 </a>
-                                <a asp-controller="Grade" asp-action="EnterScores" asp-route-id="@item.CourseClassId" class="btn btn-custom-c">
-                                    <i class="fas fa-pen-to-square me-1.5"></i>Nhập điểm
-                                </a>
+                                @if (User.IsInRole("Lecturer"))
+                                {
+                                    <a asp-controller="Grade" asp-action="EnterScores" asp-route-id="@item.CourseClassId" class="btn btn-custom-c">
+                                        <i class="fas fa-pen-to-square me-1.5"></i>Nhập điểm
+                                    </a>
+                                }
                             </div>
                         </td>
                     </tr>
@@ -202,5 +209,4 @@
             }
         </tbody>
     </table>
-
 </div>
