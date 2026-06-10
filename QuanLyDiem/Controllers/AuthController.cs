@@ -26,7 +26,6 @@ namespace QuanLyDiem.Controllers
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login() => View();
-
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -37,10 +36,25 @@ namespace QuanLyDiem.Controllers
 
             if (user != null)
             {
-                bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+                bool isPasswordValid = false;
+
+                if (user.Password.StartsWith("$2a$"))
+                {
+                    isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+                }
+                else
+                {
+                    isPasswordValid = new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, model.Password) == PasswordVerificationResult.Success;
+                }
 
                 if (isPasswordValid)
                 {
+                    if (!user.Password.StartsWith("$2a$"))
+                    {
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
+                        await _context.SaveChangesAsync();
+                    }
+
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Name, user.FullName),
                         new Claim(ClaimTypes.Role, user.Role),
@@ -53,7 +67,6 @@ namespace QuanLyDiem.Controllers
                 }
             }
 
-            // Chỉ chạy dòng này nếu user null hoặc mật khẩu sai
             ModelState.AddModelError(string.Empty, "Thông tin đăng nhập không chính xác.");
             return View(model);
         }
