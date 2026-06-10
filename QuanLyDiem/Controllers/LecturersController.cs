@@ -73,8 +73,7 @@ public class LecturersController : Controller
         string rawPassword = GenerateRandomPassword();
 
         // Tiến hành băm (mã hóa) mật khẩu thô thành chuỗi ký tự bảo mật cao trước khi lưu vào Database
-        user.Password = BCrypt.Net.BCrypt.HashPassword(rawPassword);
-
+        user.Password = new PasswordHasher<User>().HashPassword(user, rawPassword);
 
         if (ModelState.IsValid)
         {
