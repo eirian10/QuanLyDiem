@@ -207,28 +207,30 @@ namespace QuanLyDiem.Controllers
             return View();
         }
 
-        // Bắt đầu luồng Google
         [AllowAnonymous]
         [HttpGet]
         public IActionResult LoginWithGoogle()
         {
+            //Tạo đường dẫn để  Google biết đường quay về đúng hàm GoogleCallback
             var redirectUrl = Url.Action("GoogleCallback", "Auth");
+            //dong goi duong dan
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            //Đẩy toàn bộ trình duyệt của user sang trang Google để đăng nhập, sau khi đăng nhập thành công thì Google sẽ tự động quay về đường dẫn redirectUrl đã chỉ định ở trên
             return Challenge(properties, "Google");
         }
 
-        // Google callback về đây
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GoogleCallback()
         {
+            //Nhận và giải mã thùng dữ liệu từ Google gửi về
             var result = await HttpContext.AuthenticateAsync("Google");
             if (!result.Succeeded)
             {
                 TempData["Error"] = "Đăng nhập Google thất bại.";
                 return RedirectToAction("Login");
             }
-
+            //Lay email từ dữ liệu Google trả về
             var email = result.Principal?.FindFirstValue(ClaimTypes.Email);
             if (email == null)
             {

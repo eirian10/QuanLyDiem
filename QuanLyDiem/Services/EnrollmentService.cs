@@ -100,8 +100,8 @@ namespace QuanLyDiem.Services
 
             if (isAlreadyInSubjectThisSemester)
                 return (false, "Sinh viên này đã đăng ký môn học này trong học kỳ hiện tại.");
-
-            _context.Enrollments.Add(new Enrollment
+            
+            _context.Enrollments.Add(new Enrollment 
             {
                 CourseClassId = courseClassId,
                 StudentId = student.StudentId

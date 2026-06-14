@@ -16,10 +16,6 @@ namespace QuanLyDiem.Services
             _context = context;
         }
 
-        // Lấy danh sách sinh viên: Lọc theo Id của lớp và từ khóa tìm kiếm
-        // =========================================================================
-        // CẬP NHẬT: Thêm tham số phân trang và trả về Tuple (Dữ liệu, Tổng số bản ghi)
-        // =========================================================================
         public async Task<(IEnumerable<Student> Data, int TotalRecords)> GetAllStudentsAsync(
             int? homeroomClassId, string? searchString, int pageNumber, int pageSize)
         {
@@ -53,7 +49,6 @@ namespace QuanLyDiem.Services
             return (data, totalRecords);
         }
 
-        // Lấy danh sách tất cả các lớp sinh hoạt để nạp vào Dropdown tương tác trên View
         public async Task<List<HomeroomClass>> GetUniqueClassesAsync()
         {
             return await _context.HomeroomClasses.ToListAsync();

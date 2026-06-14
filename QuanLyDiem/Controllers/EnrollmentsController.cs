@@ -21,7 +21,6 @@ namespace QuanLyDiem.Controllers
             ViewBag.SelectedSemesterId = semesterId;
             ViewBag.Search = search;
 
-            //  Lấy danh sách học kỳ đẩy vào ViewBag để làm bộ lọc động
             ViewBag.Semesters = await _enrollmentService.GetAllSemestersAsync();
 
             if (User.IsInRole("Admin"))
@@ -40,7 +39,6 @@ namespace QuanLyDiem.Controllers
             return View(lecturerClasses);
         }
 
-        // 2. Xem chi tiết danh sách sinh viên trong lớp
         public async Task<IActionResult> Details(int id)
         {
             var courseClass = await _enrollmentService.GetClassDetailsAsync(id);
@@ -55,18 +53,16 @@ namespace QuanLyDiem.Controllers
             return View(students);
         }
 
-        // 3. Thêm thủ công bằng Mã sinh viên
         [HttpPost]
         public async Task<IActionResult> AddStudentManual(int courseClassId, string studentCode)
         {
             var result = await _enrollmentService.AddStudentManualAsync(courseClassId, studentCode);
             if (result.IsSuccess) TempData["Success"] = result.Message;
             else TempData["Error"] = result.Message;
-
+            //dinh kem courseClassId de khi redirect ve details thi van con id de lay duoc danh sach sinh vien
             return RedirectToAction(nameof(Details), new { id = courseClassId });
         }
 
-        // 4. Import danh sách sinh viên từ file Excel
         [HttpPost]
         public async Task<IActionResult> ImportExcel(int courseClassId, IFormFile excelFile)
         {
@@ -77,7 +73,6 @@ namespace QuanLyDiem.Controllers
             return RedirectToAction(nameof(Details), new { id = courseClassId });
         }
 
-        // 5. Xóa sinh viên khỏi lớp học phần
         [HttpPost]
         public async Task<IActionResult> RemoveStudent(int courseClassId, int studentId)
         {
