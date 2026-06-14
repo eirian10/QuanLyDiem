@@ -12,79 +12,62 @@ namespace QuanLyDiem.Controllers
         public SubjectsController(SubjectService subjectService)
         {
             _subjectService = subjectService;
-        }
+        } //constructor của controller
 
         // GET: /Subjects
         // GET: /Subjects/Index
         [HttpGet("")]
         [HttpGet("Index")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index() //hàm để hiển thị danh sách môn học
         {
-            var subjects = await _subjectService.GetAllAsync();
-            return View(subjects);
+            var subjects = await _subjectService.GetAllAsync(); //gọi service lấy toàn bộ danh sách môn học
+            return View(subjects);//trả về view
         }
 
         // GET: /Subjects/Create
         [HttpGet("Create")]
-        public IActionResult Create()
+        public IActionResult Create()//hàm để hiển thị giao diện thêm môn học
         {
             return View();
         }
 
-        // GET: /Subjects/CreateModal
-        [HttpGet("CreateModal")]
-        public IActionResult CreateModal()
-        {
-            return PartialView("_SubjectForm", new Subject());
-        }
+       
 
         // POST: /Subjects/Create
         [HttpPost("Create")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Subject subject)
+        [ValidateAntiForgeryToken] //chống giả mạo request
+        public async Task<IActionResult> Create(Subject subject) //hàm này nhận môn học từ form gửi lên
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) //nếu hợp lệ
             {
-                var result = await _subjectService.CreateAsync(subject);
+                var result = await _subjectService.CreateAsync(subject);//gọi service để thực hiện thêm môn học mới
 
-                if (result.IsSuccess)
+                if (result.IsSuccess)//nếu thêm môn học thành công
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));//chuyển người dùng về trang danh sách môn học
                 }
 
-                AddSubjectErrorToModelState(result.ErrorMessage);
+                AddSubjectErrorToModelState(result.ErrorMessage);//nếu thêm hoặc sửa môn học thất bại thì báo lỗi
             }
 
-            return View(subject);
+            return View(subject);//trả về view
         }
 
         // GET: /Subjects/Edit/1
         [HttpGet("Edit/{id:int}")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id) //khai báo hàm edit
         {
-            var subject = await _subjectService.GetByIdAsync(id);
+            var subject = await _subjectService.GetByIdAsync(id); //gọi service để tìm môn học theo id
 
-            if (subject == null)
+            if (subject == null)//không tìm thấy môn học
             {
-                return NotFound();
+                return NotFound();//báo lỗi
             }
 
-            return View(subject);
+            return View(subject);//tìm thấy môn học thì trả về view
         }
 
-        // GET: /Subjects/EditModal/1
-        [HttpGet("EditModal/{id:int}")]
-        public async Task<IActionResult> EditModal(int id)
-        {
-            var subject = await _subjectService.GetByIdAsync(id);
-
-            if (subject == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("_SubjectForm", subject);
-        }
+      
 
         // POST: /Subjects/Edit/1
         [HttpPost("Edit/{id:int}")]
