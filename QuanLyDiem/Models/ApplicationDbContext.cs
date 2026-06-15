@@ -29,6 +29,7 @@ namespace QuanLyDiem.Data
             builder.Entity<Semester>().HasIndex(s => new { s.Term, s.AcademicYear }).IsUnique();
             builder.Entity<Enrollment>().HasIndex(e => new { e.StudentId, e.CourseClassId }).IsUnique();
             builder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+            builder.Entity<User>().HasIndex(u => u.Email).IsUnique();
             builder.Entity<Student>().HasIndex(s => s.StudentCode).IsUnique();
             builder.Entity<Subject>().HasIndex(s => s.SubjectCode).IsUnique();
             builder.Entity<HomeroomClass>().HasIndex(c => c.ClassName).IsUnique();

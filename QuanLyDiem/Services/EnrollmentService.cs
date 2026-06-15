@@ -142,7 +142,7 @@ namespace QuanLyDiem.Services
             await excelFile.CopyToAsync(stream);
             // ExcelPackage mở stream (file trong RAM)
             using var package = new ExcelPackage(stream);
-            var worksheet = package.Workbook.Worksheets[0];
+            var worksheet = package.Workbook.Worksheets[0]; //Lay sheet dau tien len lam viec
             int rowCount = worksheet.Dimension?.Rows ?? 0; //lấy số dòng có dữ liệu trong sheet
 
             for (int row = 2; row <= rowCount; row++)

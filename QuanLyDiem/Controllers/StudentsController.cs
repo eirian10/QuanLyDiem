@@ -82,7 +82,7 @@ namespace QuanLyDiem.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, Student std)
         {
-            if (id != std.StudentId) return NotFound();
+            if (id != std.StudentId) return NotFound(); 
 
             if (ModelState.IsValid)
             {
@@ -114,8 +114,15 @@ namespace QuanLyDiem.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _studentService.DeleteStudentAsync(id);
-            return RedirectToAction(nameof(Index));
+           bool success = await _studentService.DeleteStudentAsync(id);
+            if (success)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return NotFound();
+            }
         }
     }
 }
